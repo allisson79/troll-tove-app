@@ -1,7 +1,1 @@
-services:
-  - type: web
-    name: troll-tove
-    env: python
-    buildCommand: ""
-    startCommand: gunicorn app:app
-    autoDeploy: true
+# Removed render.yaml - switching to GitHub deploy setup via UI
