@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <title>Troll-Tove Spåkone</title>
+    <style>
+        body { font-family: monospace; background-color: #fffbf0; color: #222; text-align: center; padding: 50px; }
+        .container { max-width: 600px; margin: auto; padding: 2rem; background: #fff8d6; border-radius: 12px; box-shadow: 0 0 10px #aaa; }
+        input, button { padding: 10px; width: 100%; margin-top: 10px; font-size: 16px; }
+        .result { margin-top: 2rem; font-size: 20px; color: darkgreen; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Troll-Tove sin Spåkrok 🔮</h1>
+        <form method="POST">
+            <input type="text" name="sporsmal" placeholder="Ka vil du vite?" required><br>
+            <button type="submit">Trykk her, din jævel</button>
+        </form>
+        {% if spadom %}
+        <div class="result">
+            <p>Du spurte: <em>{{ sporsmal }}</em></p>
+            <p>{{ intro }}</p>
+            <p><strong>🔮 {{ spadom }} 🔮</strong></p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
