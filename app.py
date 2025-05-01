@@ -1,5 +1,24 @@
 from flask import Flask, render_template, request
 import random
+from flask import Flask, render_template, request
+import random
+
+def neste_glimt_kamp():
+    # Midlertidig hardkodet – bytt ut med ekte data senere
+    hjemmelag = "Bodø/Glimt"
+    bortelag = "Lillestrøm"
+    dato = "Søndag 5. mai kl 18:00"
+    
+    glimt_hjemme = "glimt" in hjemmelag.lower()
+
+    if glimt_hjemme:
+        resultat = "Glimt vinn 3–1. Pellegrino skyt så hardt at ballen eksplodere. Lillestrøm tar bussen heim i skam."
+    else:
+        resultat = "Borte mot Lillestrøm... det lukte 2–2, og en jævla hodeløs dommeravgjørelse."
+
+    return f"Neste kamp: {hjemmelag} – {bortelag}, {dato}. {resultat}"
+
+app = Flask(__name__)
 
 app = Flask(__name__)
 
@@ -35,6 +54,9 @@ def troll_tove():
     spadom = ""
     intro_valg = ""
     sporsmal = ""
+    if "kamp" in spm or "neste kamp" in spm or "lillestrøm" in spm:
+    spadom = neste_glimt_kamp()
+
     if request.method == "POST":
         sporsmal = request.form["sporsmal"]
         intro_valg = random.choice(intro)
