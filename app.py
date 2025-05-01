@@ -1,27 +1,9 @@
 from flask import Flask, render_template, request
 import random
-from flask import Flask, render_template, request
-import random
-
-def neste_glimt_kamp():
-    # Midlertidig hardkodet – bytt ut med ekte data senere
-    hjemmelag = "Bodø/Glimt"
-    bortelag = "Lillestrøm"
-    dato = "Søndag 5. mai kl 18:00"
-    
-    glimt_hjemme = "glimt" in hjemmelag.lower()
-
-    if glimt_hjemme:
-        resultat = "Glimt vinn 3–1. Pellegrino skyt så hardt at ballen eksplodere. Lillestrøm tar bussen heim i skam."
-    else:
-        resultat = "Borte mot Lillestrøm... det lukte 2–2, og en jævla hodeløs dommeravgjørelse."
-
-    return f"Neste kamp: {hjemmelag} – {bortelag}, {dato}. {resultat}"
 
 app = Flask(__name__)
 
-app = Flask(__name__)
-
+# Spådoms-lister
 spaadommer_fotball = [
     "JA, Glimt vinn – og Rosenborg kan fette ta seg en bolle med surt trønderpiss.",
     "NEI, TIL vinn aldri mer. Tromsø e bare en jævla blaut flekk på kartet.",
@@ -49,20 +31,34 @@ intro = [
     "Kraftan e mørk i dag... akkurat som mor di sin kjøttsuppe."
 ]
 
+def neste_glimt_kamp():
+    hjemmelag = "Bodø/Glimt"
+    bortelag = "Lillestrøm"
+    dato = "Søndag 5. mai kl 18:00"
+
+    glimt_hjemme = "glimt" in hjemmelag.lower()
+
+    if glimt_hjemme:
+        resultat = "Glimt vinn 3–1. Pellegrino skyt så hardt at ballen eksplodere. Lillestrøm tar bussen heim i skam."
+    else:
+        resultat = "Borte mot Lillestrøm... det lukte 2–2, og en jævla hodeløs dommeravgjørelse."
+
+    return f"Neste kamp: {hjemmelag} – {bortelag}, {dato}. {resultat}"
+
 @app.route("/", methods=["GET", "POST"])
 def troll_tove():
     spadom = ""
     intro_valg = ""
     sporsmal = ""
-    if "kamp" in spm or "neste kamp" in spm or "lillestrøm" in spm:
-    spadom = neste_glimt_kamp()
 
     if request.method == "POST":
         sporsmal = request.form["sporsmal"]
         intro_valg = random.choice(intro)
         spm = sporsmal.lower()
 
-        if any(word in spm for word in ["glimt", "bodø", "fotball", "eliteserien", "rosenborg", "molde", "tromsø", "til", "rbk"]):
+        if "kamp" in spm or "neste kamp" in spm or "lillestrøm" in spm:
+            spadom = neste_glimt_kamp()
+        elif any(word in spm for word in ["glimt", "bodø", "fotball", "eliteserien", "rosenborg", "molde", "tromsø", "til", "rbk"]):
             spadom = random.choice(spaadommer_fotball)
         else:
             spadom = random.choice(spaadommer_random)
