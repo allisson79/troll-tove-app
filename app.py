@@ -4,7 +4,7 @@ def troll_tove():
     intro_valg = ""
     sporsmal = ""
     
-    if request.method == "POST":
+        if request.method == "POST":
         sporsmal = request.form["sporsmal"]
         intro_valg = random.choice(intro)
         spm = sporsmal.lower()
