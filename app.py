@@ -9,7 +9,7 @@ def troll_tove():
         spm = sporsmal.lower()
 
         if "kamp" in spm or "neste kamp" in spm or "lillestrøm" in spm:
-            spadom = neste_glimt_kamp()
+    spadom = neste_glimt_kamp()
 
         elif any(word in spm for word in ["glimt", "bodø", "fotball", "eliteserien", "rosenborg", "molde", "tromsø", "til", "rbk"]):
             spadom = random.choice(spaadommer_fotball)
