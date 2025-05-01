@@ -21,7 +21,7 @@ spaadommer_random = [
     "Æ ser... æ ser... ingenting! Men æ føle en uggenhet i rumpa. Det e et tegn.",
     "Hvis du ikkje slutte å lyge... kjem ein ravn te å hakke øyan dine ut.",
     "Du kjem te å finne kjærligheten... bak Rema 1000... i en konteiner.",
-    "Hold dæ unna IKEA neste uke. Det blir blod.",
+    "Hold dæ unna IKEA neste uke. Det blir blod."
 ]
 
 spaadommer_fotball = [
@@ -48,4 +48,44 @@ def neste_glimt_kamp():
         data = response.json()
         fixtures = data.get("response", [])
         if not fixtures:
-            return "Ingen jævla kampdata funnet – kanskje API
+            return "Ingen jævla kampdata funnet – kanskje APIet e drita, eller Glimt tar pause for å spare på kreftan."
+
+        kamp = fixtures[0]
+        hjemmelag = kamp["teams"]["home"]["name"]
+        bortelag = kamp["teams"]["away"]["name"]
+        dato = kamp["fixture"]["date"]
+
+        glimt_hjemme = "Bodø/Glimt" in hjemmelag
+        if glimt_hjemme:
+            resultat = "Glimt vinn 3–1. Pellegrino skyt så hardt at bortelaget får PTSD."
+        else:
+            resultat = "Borte? Det bli 2–2 og dommern e føkka i høvet som vanlig."
+
+        return f"Neste kamp: {hjemmelag} – {bortelag}, {dato[:10]}. {resultat}"
+
+    except Exception as e:
+        return f"Faen, æ fekk ikkje tak i kampdata: {str(e)}"
+
+@app.route("/", methods=["GET", "POST"])
+def troll_tove():
+    spadom = ""
+    intro_valg = ""
+    sporsmal = ""
+
+    if request.method == "POST":
+        sporsmal = request.form["sporsmal"]
+        intro_valg = random.choice(intro)
+        spm = sporsmal.lower()
+
+        if any(word in spm for word in ["glimt", "kamp", "neste kamp", "bodø", "fotball", "eliteserien", "rosenborg", "molde", "tromsø", "til", "rbk", "tottenham"]):
+            if "neste kamp" in spm or "når" in spm or "møter" in spm:
+                spadom = neste_glimt_kamp()
+            else:
+                spadom = random.choice(spaadommer_fotball)
+        else:
+            spadom = random.choice(spaadommer_random)
+
+    return render_template("index.html", spadom=spadom, intro=intro_valg, sporsmal=sporsmal)
+
+if __name__ == "__main__":
+    app.run(debug=True)
