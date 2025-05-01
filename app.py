@@ -1,5 +1,38 @@
 from flask import Flask, render_template, request
 import random
+import requests
+from bs4 import BeautifulSoup
+
+def hent_neste_glimt_kamp():
+    url = "https://www.fotmob.com/teams/8651/fixtures/bod%C3%B8glimt"  # Bodø/Glimt sin kampoversikt
+    headers = {"User-Agent": "Mozilla/5.0"}
+    response = requests.get(url, headers=headers)
+
+    if response.status_code != 200:
+        return "Faen, æ fikk ikke tak i kampdata. Internett sug eller Fotmob blokkere mæ."
+
+    soup = BeautifulSoup(response.text, "html.parser")
+    
+    try:
+        kampseksjon = soup.find("a", href=True, text=lambda t: t and "Bodø" in t or "Glimt" in t)
+        kampnavn = kampseksjon.text.strip()
+        kampurl = kampseksjon["href"]
+        kampinfo = kampnavn.replace("\n", " ")
+
+        hjemmelag = kampinfo.split(" - ")[0]
+        bortelag = kampinfo.split(" - ")[1]
+
+        hvis_glimt_hjemme = "glimt" in hjemmelag.lower()
+
+        if hvis_glimt_hjemme:
+            resultat = f"Glimt vinn 3–1, og {bortelag} får rævkjøring med dobbel kraft og null sjanser."
+        else:
+            resultat = f"Borte mot {hjemmelag}? Glimt drar dit og stjæl med sæ poeng og ære – 2–2 med sinne."
+
+        return f"Neste kamp: {kampinfo}. {resultat}"
+    
+    except Exception as e:
+        return f"Det gikk til helvete å spå neste kamp. ({e
 
 app = Flask(__name__)
 
@@ -36,6 +69,21 @@ def troll_tove():
     intro_valg = ""
     sporsmal = ""
     if request.method == "POST":
+if "kamp" in spm or "neste kamp" in spm:
+    spadom = hent_neste_glimt_kamp()
+if request.method == "POST":
+    sporsmal = request.form["sporsmal"]
+    intro_valg = random.choice(intro)
+    spm = sporsmal.lower()
+
+    if "kamp" in spm or "neste kamp" in spm:
+        spadom = hent_neste_glimt_kamp()
+    elif any(word in spm for word in ["glimt", "bodø", "fotball", "eliteserien", "rosenborg", "molde", "tromsø", "til", "rbk"]):
+        spadom = random.choice(spaadommer_fotball)
+    else:
+        spadom = random.choice(spaadommer_random)
+
+
         sporsmal = request.form["sporsmal"]
         intro_valg = random.choice(intro)
         spm = sporsmal.lower()
