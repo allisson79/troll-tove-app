@@ -1,75 +1,51 @@
-from flask import Flask, render_template, request
 import os
-import requests
 import random
+import requests
+from flask import Flask, request, render_template
 from dotenv import load_dotenv
 
 load_dotenv()
+API_KEY = os.getenv("API_FOOTBALL_KEY")
 
 app = Flask(__name__)
 
-API_KEY = os.getenv("API_FOOTBALL_KEY")
-
-def neste_glimt_kamp():
-    headers = {
-        "x-rapidapi-host": "v3.football.api-sports.io",
-        "x-rapidapi-key": API_KEY
-    }
-
-    url = "https://v3.football.api-sports.io/fixtures?team=971&next=1"
-
-    try:
-        response = requests.get(url, headers=headers)
-        data = response.json()
-        kamp = data["response"][0]
-
-        hjemmelag = kamp["teams"]["home"]["name"]
-        bortelag = kamp["teams"]["away"]["name"]
-        dato = kamp["fixture"]["date"][:10]
-
-        glimt_hjemme = hjemmelag.lower() == "bodø/glimt"
-
-        if glimt_hjemme:
-            resultat = "Glimt vinn 3–1. Tottenham kan pelle sæ tilbake te puben med halen mellom beina."
-        else:
-            resultat = "Borte? Jada, 2–2. Men bare fordi dommeren e fette blind og TIL hadde flaks."
-
-        return f"Neste kamp: {hjemmelag} – {bortelag}, {dato}. {resultat}"
-
-    except Exception as e:
-        return f"Faen, æ fekk ikkje tak i kampdata: {e}"
-
 intro = [
-    "La mæ føle på universet, din stakkars jævel...",
-    "Hold kjeften din – æ må konsentrere mæ...",
-    "Troll-Tove kjenne mørke energia – og flatfyll i lufta...",
-    "Satan i hælvette... æ ser et tegn!"
+    "Satan i hælvette... æ ser et tegn!",
+    "Universet skrike – og æ høre det.",
+    "Hold kjeften og lytt, offerlam...",
+    "Æ føle det på rynkan mine... nå skjer det faenskap."
 ]
 
 spaadommer_random = [
-    "Det kjem til å gå til helvete. Men det e greit.",
-    "IKEA neste uke? Hold dæ unna, det blir kaos og blod.",
-    "Du møte en idiot med caps. Styr unna. Det blir bråk.",
-    "Æ ser... ingenting. Og det e faktisk et faresignal."
+    "Torsdag blir en jævla dag. Hold deg unna folk med caps.",
+    "Æ ser... æ ser... ingenting! Men æ føle en uggenhet i rumpa. Det e et tegn.",
+    "Hvis du ikkje slutte å lyge... kjem ein ravn te å hakke øyan dine ut.",
+    "Du kjem te å finne kjærligheten... bak Rema 1000... i en konteiner.",
+    "Hold dæ unna IKEA neste uke. Det blir blod.",
 ]
 
-@app.route("/", methods=["GET", "POST"])
-def troll_tove():
-    spadom = ""
-    intro_valg = ""
-    sporsmal = ""
+spaadommer_fotball = [
+    "RBK e ræv. Glimt kjøre over dem som en jævla dampveivals.",
+    "Tromsø? Nei, det e som å spille mot en barnehage full av blinde unger.",
+    "Glimt har form. Resten av Eliteserien har bare flaks og mødre som trur på dem.",
+    "Æ ser 2 mål fra Glimt og en keeper som gråte i dusjen etterpå.",
+    "Dommern prøve å saboter, men Glimt vinn læll. Karma, din jævel."
+]
 
-    if request.method == "POST":
-        sporsmal = request.form["sporsmal"]
-        intro_valg = random.choice(intro)
-        spm = sporsmal.lower()
+def neste_glimt_kamp():
+    url = "https://v3.football.api-sports.io/fixtures"
+    headers = {
+        "x-apisports-key": API_KEY
+    }
+    params = {
+        "team": 2619,  # Bodø/Glimt
+        "next": 1
+    }
 
-        if "glimt" in spm or "kamp" in spm or "neste kamp" in spm or "tromsø" in spm or "rosenborg" in spm:
-            spadom = neste_glimt_kamp()
-        else:
-            spadom = random.choice(spaadommer_random)
+    response = requests.get(url, headers=headers, params=params)
 
-    return render_template("index.html", spadom=spadom, intro=intro_valg, sporsmal=sporsmal)
-
-if __name__ == "__main__":
-    app.run(debug=True)
+    try:
+        data = response.json()
+        fixtures = data.get("response", [])
+        if not fixtures:
+            return "Ingen jævla kampdata funnet – kanskje API
