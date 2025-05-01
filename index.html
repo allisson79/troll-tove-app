@@ -1,16 +1,51 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="no">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.5">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-  </style>
+    <meta charset="UTF-8">
+    <title>Troll-Tove Spåkone</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            max-width: 600px;
+            margin: auto;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 20px;
+            color: darkgreen;
+        }
+    </style>
 </head>
 <body>
-<p class="p1">&lt;button type="submit"&gt;Trykk her, din jævel&lt;/button&gt;</p>
+    <div class="container">
+        <h1>Troll-Tove sin Spåkrok 🔮</h1>
+        <form method="POST">
+            <input type="text" name="sporsmal" placeholder="Ka vil du vite?" required><br>
+            <button type="submit">Spå meg!</button>
+        </form>
+        {% if spadom %}
+            <div class="result">
+                <p><strong>Du spurte:</strong> <em>{{ sporsmal }}</em></p>
+                <p><strong>{{ intro }}</strong></p>
+                <p><strong>🔮 Spådommen e klar: 🔮</strong></p>
+                <p>{{ spadom }}</p>
+            </div>
+        {% endif %}
+    </div>
 </body>
 </html>
