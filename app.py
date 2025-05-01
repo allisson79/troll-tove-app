@@ -1,49 +1,57 @@
 from flask import Flask, render_template, request
+import os
+import requests
 import random
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 
-# Intro-fraser fra Troll-Tove
-intro = [
-    "Hmm... la mæ føle litt på kraftan...",
-    "Vent no litt... æ må ta inn energian...",
-    "Oooh... det her kjennes mørkt ut...",
-    "Troll-Tove føle noe... skummelt...",
-    "Kaffen har sagt sitt... og det lukte trøbbel..."
-]
+API_KEY = os.getenv("API_FOOTBALL_KEY")
 
-# Spådommer for ulike kategorier
-spaadommer_fotball = [
-    "Rosenborg? Gå hjem og legg dokker. Det blir tap og tåra i dusjen.",
-    "Tromsø vinne kanskje på FIFA, men ikkje i virkeligheta. Glimt køyrer over dem.",
-    "Molde e som ei fiskekake uten salt – smakløs og blaut.",
-    "Glimt stille med lyn og helvete. Motstanderen har ikkje sjans.",
-    "Det blir 4-0 tell Glimt. Resten e bare å beklage til motstanderen sin familie."
+def neste_glimt_kamp():
+    headers = {
+        "x-rapidapi-host": "v3.football.api-sports.io",
+        "x-rapidapi-key": API_KEY
+    }
+
+    url = "https://v3.football.api-sports.io/fixtures?team=971&next=1"
+
+    try:
+        response = requests.get(url, headers=headers)
+        data = response.json()
+        kamp = data["response"][0]
+
+        hjemmelag = kamp["teams"]["home"]["name"]
+        bortelag = kamp["teams"]["away"]["name"]
+        dato = kamp["fixture"]["date"][:10]
+
+        glimt_hjemme = hjemmelag.lower() == "bodø/glimt"
+
+        if glimt_hjemme:
+            resultat = "Glimt vinn 3–1. Tottenham kan pelle sæ tilbake te puben med halen mellom beina."
+        else:
+            resultat = "Borte? Jada, 2–2. Men bare fordi dommeren e fette blind og TIL hadde flaks."
+
+        return f"Neste kamp: {hjemmelag} – {bortelag}, {dato}. {resultat}"
+
+    except Exception as e:
+        return f"Faen, æ fekk ikkje tak i kampdata: {e}"
+
+intro = [
+    "La mæ føle på universet, din stakkars jævel...",
+    "Hold kjeften din – æ må konsentrere mæ...",
+    "Troll-Tove kjenne mørke energia – og flatfyll i lufta...",
+    "Satan i hælvette... æ ser et tegn!"
 ]
 
 spaadommer_random = [
-    "Du kjem te å finne kjærligheten... bak Rema 1000... i en konteiner.",
-    "Hvis du ikkje slutte å lyge... kjem ein ravn te å hakke øyan dine ut.",
-    "Torsdag blir en jævlig dag. Hold deg unna folk med caps.",
-    "Æ ser... æ ser... ingenting! Men æ føle en uggenhet i rumpa. Det e et tegn.",
-    "En fremmed vil tilby dæ potetgull... Si ja. Det e skjebnen som snakke.",
-    "Hold dæ unna IKEA neste uke. Det blir blod."
+    "Det kjem til å gå til helvete. Men det e greit.",
+    "IKEA neste uke? Hold dæ unna, det blir kaos og blod.",
+    "Du møte en idiot med caps. Styr unna. Det blir bråk.",
+    "Æ ser... ingenting. Og det e faktisk et faresignal."
 ]
-
-def neste_glimt_kamp():
-    # Midlertidig hardkodet – bytt ut med ekte data senere
-    hjemmelag = "Bodø/Glimt"
-    bortelag = "Lillestrøm"
-    dato = "Søndag 5. mai kl 18:00"
-
-    glimt_hjemme = "glimt" in hjemmelag.lower()
-
-    if glimt_hjemme:
-        resultat = "Glimt vinn 3–1. Pellegrino skyt så hardt at ballen eksplodere. Lillestrøm tar bussen heim i skam."
-    else:
-        resultat = "Borte mot Lillestrøm... det lukte 2–2, og en jævla hodeløs dommeravgjørelse."
-
-    return f"Neste kamp: {hjemmelag} – {bortelag}, {dato}. {resultat}"
 
 @app.route("/", methods=["GET", "POST"])
 def troll_tove():
@@ -56,22 +64,12 @@ def troll_tove():
         intro_valg = random.choice(intro)
         spm = sporsmal.lower()
 
-        # Hvis spørsmålet handler om Glimt og seier
-        if "glimt" in spm and "vinn" in spm:
-            spadom = (
-                "Glimt vinn faen meg 2–1, og motstanderen får ræva parkert i fjæra med pukk i sokkan. "
-                "Pellegrino bøtte inn mål og får en forsvarsspiller til å grine på direkten."
-            )
-
-        elif "kamp" in spm or "neste kamp" in spm or "lillestrøm" in spm:
+        if "glimt" in spm or "kamp" in spm or "neste kamp" in spm or "tromsø" in spm or "rosenborg" in spm:
             spadom = neste_glimt_kamp()
-
-        elif any(word in spm for word in [
-            "glimt", "fotball", "eliteserien", "rosenborg", "til", "tromsø", "molde", "tottenham"
-        ]):
-            spadom = random.choice(spaadommer_fotball)
-
         else:
             spadom = random.choice(spaadommer_random)
 
     return render_template("index.html", spadom=spadom, intro=intro_valg, sporsmal=sporsmal)
+
+if __name__ == "__main__":
+    app.run(debug=True)
