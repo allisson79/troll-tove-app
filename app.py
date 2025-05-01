@@ -10,8 +10,9 @@ def neste_glimt_kamp():
     dato = "Søndag 5. mai kl 18:00"
     
     glimt_hjemme = "glimt" in hjemmelag.lower()
-    if "kamp" in spm or "neste kamp" in spm or "lillestrøm" in spm:
+   if "kamp" in spm or "neste kamp" in spm or "lillestrøm" in spm:
     spadom = neste_glimt_kamp()
+
 
     if glimt_hjemme:
         resultat = "Glimt vinn 3–1. Pellegrino skyt så hardt at ballen eksplodere. Lillestrøm tar bussen heim i skam."
