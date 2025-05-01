@@ -46,4 +46,3 @@ def troll_tove():
             spadom = random.choice(spaadommer_random)
 
     return render_template("index.html", spadom=spadom, intro=intro_valg, sporsmal=sporsmal)
-``
