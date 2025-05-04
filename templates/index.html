@@ -5,50 +5,56 @@
     <title>Troll-Tove Spåkone</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #fdf0f0;
+            font-family: Arial, sans-serif;
+            background-color: #fff8f0;
             text-align: center;
             padding: 50px;
         }
         .container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
-            max-width: 700px;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
             margin: auto;
+        }
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
         }
         input, button {
             padding: 12px;
             font-size: 16px;
-            margin-top: 10px;
+            margin: 10px 0;
             width: 100%;
+            border-radius: 8px;
             border: 1px solid #ccc;
-            border-radius: 6px;
         }
         button {
-            background-color: darkred;
-            color: #fff;
+            background-color: #8b0000;
+            color: white;
             font-weight: bold;
             cursor: pointer;
         }
         .result {
             margin-top: 30px;
-            font-size: 20px;
-            color: darkgreen;
+            font-size: 18px;
+            color: #333;
         }
-        .header {
-            font-size: 30px;
+        .troll-emoji {
+            font-size: 40px;
             margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">🔮 Troll-Tove sin Spåkrok 🔮</div>
+        <div class="troll-emoji">🔮</div>
+        <h1>Troll-Tove sin Spåkrok</h1>
+        <p>Skriv navnet ditt og et spørsmål, så skal Troll-Tove fortelle deg sannheta – på brutalt vis!</p>
         <form method="POST">
-            <input type="text" name="navn" placeholder="Ka heite du, din forbanna dust?" required><br>
-            <input type="text" name="sporsmal" placeholder="Ka vil du vite? F.eks 'Når spille Glimt?'" required><br>
+            <input type="text" name="navn" placeholder="Ka heite du, din forbanna dust?" required>
+            <input type="text" name="sporsmal" placeholder="Ka vil du vite? F.eks 'Når spille Glimt?'" required>
             <button type="submit">Spå mæ, Tove!</button>
         </form>
 
