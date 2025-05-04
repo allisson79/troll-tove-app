@@ -1,76 +1,73 @@
 from flask import Flask, render_template, request
-import random
-import os
-import requests
 from dotenv import load_dotenv
-from collections import defaultdict
-from datetime import datetime, timedelta
+import os
+import random
+import requests
+from datetime import datetime
 from ipaddress import ip_address
 
 load_dotenv()
 
 app = Flask(__name__)
 
-# Spådommer (30 fotballrelaterte og 30 generelle)
-fotball_spa = [
-    "Glimt vinn serien, men det blir faen ikke pent!", "Saltnes blir solgt til Rosenborg, æ brekk mæ!", "Glimt tape mot et jævla OBOS-lag i cupen.", 
-    "Pellegrino skår mål med ræva, og ælskes i media.", "Kjetil Knutsen legg opp og bli fiskar.", "Det blir faen meg snøstorm på kampdag.",
-    "Dommeren e søring og Glimt får straff imot som vanlig.", "Bodø/Glimt rykke ned etter en historisk dårlig høstsesong.", 
-    "Glimt kjøp en islending som heter noe ingen kan uttal.", "Zinkernagel kommer tebake og tar over hele jævla laget.", 
-    "Bortefeltet på Lerkendal blir tomt – ingen gidde se på rævva fotball.", "Det blir 4–4 mot Sandefjord. Faen heller.", 
-    "Keeperen sklit og score sjølmål. Herregud.", "Ulrik Saltnes få seg ny sveiseblind frisør. Krisemøte i Glimt.", 
-    "TIL lede serien i en dag, så går det rett åt helvete.", "Mjøndalen bli Norges beste lag. Nei vent, det skjer aldri.", 
-    "Molde og Rosenborg fusjonere – og kalle laget MØKK.", "Bodø/Glimt skår 10 mål, men det blir uavgjort.", 
-    "Svenskene i Glimt glemme ka kamp e og møte opp i dress.", "Dommere innføre nytt regelverk: Glimt får aldri frispark.",
-    "Ny stadion på Rognan, alle må pendle med jævla hurtigbåt.", "Bortekamper i Europa? Garantert flystreik!", 
-    "Glimt bytt draktfarge til lilla for å 'skille sæ ut'.", "Hele Aspmyra bli stengt – for mye bannskap.", 
-    "Spillerne streike for å få bedre kaffemaskin i garderoben.", "Supporterne boikotte stadion for at pølsan e lunka.", 
-    "VAR innføres i Eliteserien og alt går til helvete.", "Ny Glimt-låt toppa Spotify, men e ræva.", 
-    "Glimt kjøp spiss fra Færøyene. Blir toppscorer.", "Æ tar ikke feil – Glimt vinne med 7 mål mot Rosenborg!"
-]
+# Caching spådommer basert på IP
+ip_cache = {}
 
-annet_spa = [
-    "Du kommer til å søle kaffe i fanget i morra tidlig.", "Naboen din planlegge å begynne med trompet.", 
-    "Mobilen din ramle i dass. Igjen.", "Du får plutselig lyst på leverpostei. Hva faen?", 
-    "Noen du kjenne farge håret blått og mene det e 'en vibe'.", "Du blir oppringt av en svindler, og vurderer faktisk å høre på han.", 
-    "Skoa dine blir spist av en hund. Ikke din hund.", "Du blir lurt med på yoga og fjerte høyt under stillhet.", 
-    "Du glemme pin-koden og skjemme dæ ut i butikken.", "Noen roper navnet ditt, men det va ikke dæ. Pinlig.", 
-    "Du får uventet besøk – og huset ser ut som et jævla katastrofeområde.", "Du spis taco tirsdag, onsdag og torsdag. Livet er godt.", 
-    "Du blir sittende fast i heis med en som snakke om krystalla.", "Du blir forbanna på printeren – og det vise sæ å være din feil.", 
-    "En måse stjel matpakka di. Naturen hate dæ.", "Du får plutselig lyst å løpe maraton. Det går over fort.", 
-    "Du trør i bæsj. Igjen.", "Noen tagger bilen din med 'søt bil'. For en idiot.", 
-    "Du bestille pakke – den havne i Hammerfest.", "Du sovne på sofaen og våkne 6 timer før vekkerklokka.", 
-    "Du får melding fra eksen. Slett den.", "Du mister nettet midt i Netflix-finale. Livskrise.", 
-    "Du drømme om at du e naken på jobb. Igjen.", "Du tråkke på legokloss. Barna dine flire.", 
-    "Du begynne å høre på country. Ikke si det til nån.", "Du tenke å starte podcast. Ikke gjør det.", 
-    "Kaffemaskinen streike. Kontoret går til helvete.", "Du få ny sveis og angre i det sekundet det e for seint.", 
-    "Noen spør om du har gått ned i vekt. Du har ikke det.", "Du planlegg å rydde boden – men ser en serie i stedet."
-]
+# Ekte kampdata (API-Football)
+API_KEY = os.getenv("API_FOOTBALL_KEY")
+TEAM_ID = 5412  # Bodø/Glimt sitt ID i APIet
+BASE_URL = "https://v3.football.api-sports.io"
 
-# Enkel IP-rate limiter
-ip_log = defaultdict(lambda: {"last_request": None, "last_result": None})
+headers = {
+    "x-apisports-key": API_KEY
+}
+
+# 30 unike spådommer (15 fotball, 15 tull)
+predictions = [
+    "Glimt vinner 3-1, og Saltnes scorer fra 30 meter!",
+    "Det blir tap i dag, 2-0. Dårlig dag på jobben.",
+    "Kampen blir avlyst. For mye vind på Aspmyra.",
+    "Glimt knuser motstanderen 5-0. Helvete heller!",
+    "En eller annen idiot får rødt kort – ikke bli overraska.",
+    "3-3 og et latterlig straffedrama på slutten.",
+    "Kampen blir 0-0. Folk går hjem og angrer på billetten.",
+    "Dommeren ødelegger alt. Som vanlig.",
+    "Glimt scorer i første minutt og parkerer bussen etterpå.",
+    "Salvesen putter hat-trick, alle på hodet.",
+    "Motstanderen får mål annullert – og det blir ramaskrik.",
+    "Keeperen gjør en tabbe. Du kommer til å banne høyt.",
+    "Ulrik Saltnes blir banens beste, selv om han starter på benken.",
+    "Glimt bommer på straffe. Igjen.",
+    "En supporter stormer banen og stjeler showet.",
+    "Du kommer til å bli svett i ræva av å følge med.",
+    "Spill ei tippekupong – men ikke stol på meg.",
+    "Stjerna i dag blir en du aldri har hørt om før.",
+    "Det blir VAR-helvete og 7 minutter tilleggstid.",
+    "Sola skinner, men spillet blir grått som november.",
+    "Du burde egentlig sett kampen hjemme med øl i handa.",
+    "Motstanderen scorer selvmål. Karma, din jævel!",
+    "Glimt vinner på overtid. Det blir hyl og skrik i stua.",
+    "En ball går over taket på stadion. Den ser du aldri igjen.",
+    "Bortefansen klikker og begynner å hive pølser på banen.",
+    "Kommentatoren mister stemmen av rein begeistring.",
+    "Kampen blir historisk – på godt eller vondt.",
+    "Alle byttene til Glimt funker som faen. Magi.",
+    "Du vinner ikke tippinga i dag, bare gi opp.",
+    "En katt springer over banen og stopper spillet."
+]
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    ip_key = str(ip_address(user_ip.split(",")[0].strip()))
+
     if request.method == "POST":
-        user_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
-        ip_key = str(ip_address(user_ip))
-        now = datetime.utcnow()
-
-        last_entry = ip_log[ip_key]
-        last_time = last_entry["last_request"]
-        last_result = last_entry["last_result"]
-
-        if last_time and (now - last_time) < timedelta(minutes=5):
-            result = last_result
+        if ip_key in ip_cache:
+            prediction = ip_cache[ip_key]
         else:
-            result = random.choice(fotball_spa + annet_spa)
-            ip_log[ip_key]["last_request"] = now
-            ip_log[ip_key]["last_result"] = result
+            prediction = random.choice(predictions)
+            ip_cache[ip_key] = prediction
 
-        return render_template("result.html", result=result)
+        return render_template("result.html", prediction=prediction)
 
     return render_template("index.html")
-
-if __name__ == "__main__":
-    app.run(debug=True)
