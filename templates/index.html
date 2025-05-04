@@ -3,58 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <title>Troll-Tove Spåkone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Rock+Salt&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #fff8f0;
-            text-align: center;
+            font-family: 'Rock Salt', cursive;
+            background: url("/static/troll-tove-bg.jpg") no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            text-shadow: 1px 1px 2px #000;
             padding: 50px;
         }
         .container {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            max-width: 600px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 25px crimson;
+            max-width: 700px;
             margin: auto;
-        }
-        h1 {
-            font-size: 32px;
-            margin-bottom: 20px;
         }
         input, button {
             padding: 12px;
             font-size: 16px;
-            margin: 10px 0;
+            margin-top: 10px;
             width: 100%;
-            border-radius: 8px;
-            border: 1px solid #ccc;
+            border: none;
+            border-radius: 6px;
+        }
+        input {
+            background-color: #300;
+            color: #fff;
         }
         button {
-            background-color: #8b0000;
-            color: white;
+            background-color: darkred;
+            color: #fff;
             font-weight: bold;
             cursor: pointer;
+            font-family: 'Creepster', cursive;
+        }
+        button:hover {
+            background-color: crimson;
         }
         .result {
             margin-top: 30px;
-            font-size: 18px;
-            color: #333;
+            font-size: 22px;
+            color: #ffdddd;
         }
-        .troll-emoji {
-            font-size: 40px;
+        .header {
+            font-size: 36px;
             margin-bottom: 20px;
+            font-family: 'Creepster', cursive;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="troll-emoji">🔮</div>
-        <h1>Troll-Tove sin Spåkrok</h1>
-        <p>Skriv navnet ditt og et spørsmål, så skal Troll-Tove fortelle deg sannheta – på brutalt vis!</p>
+        <div class="header">🔮 Troll-Tove si forbanna spåkrok 🔮</div>
         <form method="POST">
-            <input type="text" name="navn" placeholder="Ka heite du, din forbanna dust?" required>
-            <input type="text" name="sporsmal" placeholder="Ka vil du vite? F.eks 'Når spille Glimt?'" required>
+            <input type="text" name="navn" placeholder="Ka heite du, din forbanna dust?" required><br>
+            <input type="text" name="sporsmal" placeholder="Ka vil du vite? F.eks 'Blir det regn i helga?'" required><br>
             <button type="submit">Spå mæ, Tove!</button>
         </form>
 
