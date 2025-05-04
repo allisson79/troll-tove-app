@@ -1,1 +1,45 @@
-{}
+from flask import Flask, render_template, request
+import random
+import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+app = Flask(__name__)
+
+# Nye fotballspådommer med oppdatert spillerliste
+spaadommer_fotball = [
+    "Patrick smell inn et mål, og dommeren ser ut som han har fått juling.",
+    "Julian redde alt – som en forbanna vegg av nordnorsk hat.",
+    "Ulrik kjefte så høyt at hele motstanderlaget skiftet truser i pausen.",
+    "Pelle hadde scora, men han va fette forbanna på linjemannen.",
+    "Jens Petter drible så hardt at backen til motstandern ramla i koma.",
+    "Håkon smell ballen i tverrligger og rope faen så det høres i Lofoten.",
+    "Fredrik Sjøvold blir helten med ei tå som traff som ei kanonkule.",
+    "Sondre Sørli skyte fra 40 meter og skrik JÆVLA MØKK før den går inn.",
+    "Mikkel får rødt kort, men rekker å scora før han går av banen.",
+    "Haikin redde straffe og glise som en jævel i sola.",
+    "Villads sklitakle så hardt at gresset på Aspmyra bytte farge.",
+    "Odin score på corner med hodet – og skrike KOM IGJEN NO, FITTEFAEN!",
+    "Isak løp som en jævel og putta fra skrått hold.",
+    "Sondre B. Fet sette inn 1–0 og spytte på Rosenborgbenken.",
+    "Daniel smell inn 2–1 og gir finger’n til TIL-supporteran.",
+    "Helmersen komme inn og gjør jobben, som faen.",
+    "Haitam hadde ikke dagen, men det hadde fanden meg resten av laget.",
+    "Fredrik Bjørkan løp opp hele høyresida og banka ballen i mål.",
+    "Jostein blokka alt som kom. Ka e det laget her laga av? Stål og snus.",
+    "Sondre Auklend klinka inn 3–0 – og publikum gikk av hengslan.",
+    "Blomberg hoppa høgst og skalla inn seiersmålet – med vilje.",
+    "Brede rev hodet av en spiss – bildelig talt – og blei dagens helt.",
+    "Jeppe kom seg fri og skøyt som om fanden va etter han.",
+    "Moe va overalt – som lus på ei billigkåpe. Ingenting slapp forbi.",
+    "Saltnes... herregud, han bare dominerte midtbanen som en forbanna general.",
+    "Gundersen hadde assist og en smell i trynet – og smilte likevel.",
+    "Pelle score og sparke cornerflagget i to. Heldigvis hadde vi ekstra.",
+    "Helmersen lurte keeperen som en luring fra Lofoten.",
+    "Evjen satt ballen i mål og slo hjul. Trur han va glad – eller gal.",
+    "Kasper putta to mål og ble jaga av hele TIL-benk med nevene klare."
+]
+
+# Resterende deler av app.py beholdes som de er
