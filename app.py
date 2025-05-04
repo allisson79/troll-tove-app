@@ -3,7 +3,7 @@ import random
 import requests
 import os
 from datetime import datetime
-from dotenv import load\_dotenv
+from dotenv import load_dotenv
 
 load\_dotenv()
 
