@@ -6,20 +6,20 @@
     <style>
         body {
             font-family: 'Georgia', serif;
-            background: linear-gradient(to bottom, #2c0000, #4d0000);
+            background: url('/static/troill_tove.jpg') no-repeat center center fixed;
+            background-size: cover;
             color: #f8e3e3;
             text-align: center;
             padding: 50px;
-            background-attachment: fixed;
-            background-size: cover;
+            margin: 0;
         }
-        .container {
+        .overlay {
             background-color: rgba(0, 0, 0, 0.75);
-            padding: 30px;
+            padding: 40px;
             border-radius: 12px;
-            box-shadow: 0 0 30px rgba(255,0,0,0.4);
-            max-width: 700px;
+            max-width: 750px;
             margin: auto;
+            box-shadow: 0 0 30px rgba(255,0,0,0.4);
         }
         input, button {
             padding: 12px;
@@ -50,7 +50,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="overlay">
         <div class="header">🔮 Troll-Tove sin Spåkrok 🔮</div>
         <form method="POST">
             <input type="text" name="navn" placeholder="Ka heite du, din forbanna dust?" required><br>
