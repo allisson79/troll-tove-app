@@ -4,10 +4,37 @@
     <meta charset="UTF-8">
     <title>Troll-Tove Spåkone</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f3f3f3; text-align: center; padding: 50px; }
-        .container { background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.2); max-width: 600px; margin: auto; }
-        input, button { padding: 10px; font-size: 16px; margin-top: 10px; width: 100%; }
-        .result { margin-top: 20px; font-size: 20px; color: darkgreen; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f3f3;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            max-width: 700px;
+            margin: auto;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 20px;
+            color: darkgreen;
+            white-space: pre-wrap;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 12px;
+            color: #888;
+        }
     </style>
 </head>
 <body>
@@ -20,12 +47,15 @@
         </form>
         {% if spadom %}
             <div class="result">
-                <p>Du spurte: <em>{{ sporsmal }}</em></p>
-                <p>{{ intro }}</p>
+                <p><strong>Du spurte:</strong> <em>{{ sporsmal }}</em></p>
+                <p><strong>Universet skrike – og æ høre det.</strong></p>
                 <p><strong>Svaret fra Troll-Tove:</strong></p>
                 <p>💀 {{ spadom }} 💀</p>
             </div>
         {% endif %}
+        <div class="footer">
+            Troll-Tove© 2025. Ingen garanti for lykke.
+        </div>
     </div>
 </body>
 </html>
