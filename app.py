@@ -1,60 +1,65 @@
-import os
+from flask import Flask, render\_template, request
 import random
 import requests
-from flask import Flask, render_template, request
-from dotenv import load_dotenv
+import os
 from datetime import datetime
 
-load_dotenv()
-app = Flask(__name__)
+app = Flask(**name**)
 
-# Midlertidig cache for IP og forrige svar
-ip_cache = {}
+# Glimt-spillere (kun fornavn)
 
-API_KEY = os.getenv("FOOTBALL_API_KEY")
-TEAM_ID = 327  # Bodø/Glimt sin ID i API-FOOTBALL
-
-spillere_glimt = [
-    "Julian", "Nikita", "Magnus", "Villads", "Odin", "Haitam", "Jostein",
-    "Fredrik", "Brede", "Patrick", "Sondre", "Ulrik", "Håkon", "Jeppe",
-    "Kasper", "Jens", "Ole", "Andreas", "Daniel", "Isak", "Sondre", "Mikkel"
+spillere\_glimt = \[
+"Julian", "Nikita", "Magnus",
+"Villads", "Odin", "Haitam", "Jostein", "Fredrik", "Brede", "Sjøvold",
+"Patrick", "Sondre", "Ulrik", "Fet", "Håkon", "Jeppe",
+"Kasper", "Jens", "Ole", "Andreas", "Daniel", "Isak", "Sondre", "Mikkel"
 ]
 
-spaadommer_fotball = [
-    "{spiller} smell inn en suser fra 25 meter – keeperen renn heim til mora si.",
-    "{spiller} blir matchvinner – og hele jævla Tromsø hyle i skam.",
-    "Rosenborg ryke som vanlig, {spiller} danse på ruinan deres.",
-    "{spiller} score hat-trick – og dommeren besvime av ærefrykt.",
-    "Molde får smake ræv – {spiller} ordne opp som vanlig.",
-    "{spiller} smell inn vinnermålet på overtid. Publikum gå amok."
+# Spådommer for fotballkamper med formatert spillerplass
+
+spaadommer\_fotball = \[
+"{spiller} smell inn to mål og sende motstanderen heim i bleie.",
+"{spiller} skyt så hardt at ballen må hentes på Rønvikjordene.",
+"{spiller} fære i strupen på hele forsvaret og score hat-trick.",
+"{spiller} knuse drømman te Rosenborg-supporteran med en hælspark i krysset.",
+"{spiller} e så varm at stadion ta fyr – 2 mål og assist.",
+"{spiller} dribla halve laget og legg inn til seg sjøl for scoring."
 ]
 
-spaadommer_random = [
-    "Du kjem te å finne kjærligheten... bak Rema 1000... i en konteiner.",
-    "Hvis du ikkje slutte å lyge... kjem ein ravn te å hakke øyan dine ut.",
-    "Torsdag blir en jævlig dag. Hold deg unna folk med caps.",
-    "Æ ser... æ ser... ingenting! Men æ føle en uggenhet i rumpa. Det e et tegn.",
-    "En fremmed vil tilby dæ potetgull... Si ja. Det e skjebnen som snakke.",
-    "Hold dæ unna IKEA neste uke. Det blir blod."
+# Spådommer for annet
+
+spaadommer\_random = \[
+"Du kommer tell å trø på en Lego i natt.",
+"Nån plan du har kommer tell å gå rett vest.",
+"Hold kjeften din lukka i morra – ellers blir det bråk.",
+"Pengene dine flyg som løvetannfrø i vinden.",
+"Du får uventa besøk... og det lukta svette sokka."
 ]
 
-intro = [
-    "Hmm... la mæ føle litt på kraftan...",
-    "Vent no litt... æ må ta inn energian...",
-    "Oooh... det her kjennes mørkt ut...",
-    "Troll-Tove føle noe... skummelt..."
+intro = \[
+"Satan i hælvette... æ ser et tegn!",
+"Hmm... la mæ føle litt på kraftan...",
+"Det lukta svette og faenskap... det blir et svar nu.",
+"Ååå dæven... kortan mine danse.",
+"Universet skrike – og æ høre det."
 ]
 
+def hent\_neste\_glimt\_kamp():
+url = "[https://v3.football.api-sports.io/fixtures](https://v3.football.api-sports.io/fixtures)"
+headers = {"x-apisports-key": os.getenv("API\_FOOTBALL\_KEY")}
+params = {
+"team": 327,  # Bodø/Glimt sin ID
+"next": 1
+}
 
-def hent_neste_glimt_kamp():
-    url = "https://v3.football.api-sports.io/fixtures"
-    headers = {"x-apisports-key": API_KEY}
-    params = {
-        "team": TEAM_ID,
-        "next": 1
-    }
+```
+try:
     response = requests.get(url, headers=headers, params=params)
+    response.raise_for_status()
     data = response.json()
+
+    if not data["response"]:
+        return "⚠️ Klarte ikke å hente kampdata – det ser ut som det ikke er noen kommende kamper."
 
     kamp = data['response'][0]
     hjemmelag = kamp['teams']['home']['name']
@@ -66,42 +71,34 @@ def hent_neste_glimt_kamp():
     tilfeldig_spiller = random.choice(spillere_glimt)
     base = random.choice(spaadommer_fotball).format(spiller=tilfeldig_spiller)
 
-    resultat = f"Neste kamp: {hjemmelag} – {bortelag} ({dato}). {base}"
-    return resultat
+    return f"Neste kamp: {hjemmelag} – {bortelag} ({dato}). {base}"
 
+except Exception as e:
+    return f"💀 Faen, æ fekk ikkje tak i kampdata: {str(e)} 💀"
+```
 
-def hent_unikt_spadom(ip, sporsmal):
-    if any(ord in sporsmal.lower() for ord in ["glimt", "kamp", "eliteserien", "score"]):
-        kandidat = hent_neste_glimt_kamp()
+@app.route("/", methods=\["GET", "POST"])
+def troll\_tove():
+spadom = ""
+intro\_valg = ""
+sporsmal = ""
+
+```
+if request.method == "POST":
+    sporsmal = request.form["sporsmal"]
+    intro_valg = random.choice(intro)
+    spm = sporsmal.lower()
+
+    if any(word in spm for word in ["kamp", "neste kamp", "score", "spiller", "glimt", "resultat"]):
+        spadom = hent_neste_glimt_kamp()
+    elif any(word in spm for word in ["glimt", "bodø", "fotball", "eliteserien", "rosenborg", "molde", "tromsø", "til", "rbk"]):
+        spiller = random.choice(spillere_glimt)
+        spadom = random.choice(spaadommer_fotball).format(spiller=spiller)
     else:
-        kandidat = random.choice(spaadommer_random)
+        spadom = random.choice(spaadommer_random)
 
-    forrige = ip_cache.get(ip)
-    while kandidat == forrige:
-        kandidat = random.choice(spaadommer_random)
+return render_template("index.html", spadom=spadom, intro=intro_valg, sporsmal=sporsmal)
+```
 
-    ip_cache[ip] = kandidat
-    return kandidat
-
-
-@app.route("/", methods=["GET", "POST"])
-def troll_tove():
-    spadom = ""
-    intro_valg = ""
-    sporsmal = ""
-
-    if request.method == "POST":
-        sporsmal = request.form["sporsmal"]
-        ip = request.remote_addr
-        intro_valg = random.choice(intro)
-
-        try:
-            spadom = hent_unikt_spadom(ip, sporsmal)
-        except Exception as e:
-            spadom = f"Faen, æ fekk ikkje tak i kampdata: {str(e)}"
-
-    return render_template("index.html", spadom=spadom, intro=intro_valg, sporsmal=sporsmal)
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
+if **name** == "**main**":
+app.run(debug=True)
