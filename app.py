@@ -1,22 +1,32 @@
-from flask import Flask, render_template, request
-import random
-import json
 import os
-from dotenv import load_dotenv
+import random
 import requests
+from flask import Flask, render_template, request
+from dotenv import load_dotenv
 from datetime import datetime
 
 load_dotenv()
-
 app = Flask(__name__)
 
-# Spådombanker
+# Midlertidig cache for IP og forrige svar
+ip_cache = {}
+
+API_KEY = os.getenv("FOOTBALL_API_KEY")
+TEAM_ID = 327  # Bodø/Glimt sin ID i API-FOOTBALL
+
+spillere_glimt = [
+    "Julian", "Nikita", "Magnus", "Villads", "Odin", "Haitam", "Jostein",
+    "Fredrik", "Brede", "Patrick", "Sondre", "Ulrik", "Håkon", "Jeppe",
+    "Kasper", "Jens", "Ole", "Andreas", "Daniel", "Isak", "Sondre", "Mikkel"
+]
+
 spaadommer_fotball = [
-    "Glimt vinn 2–1. Hauge legg opp, og Høgh banka inn vinnermålet med ræva.",
-    "3–0 te Glimt. Keeperen tel motstanderlaget begynne å grine. Heile laget gir opp og begynne å søke NAV.",
-    "Det blir 1–1. Dommeren e fra Trøndelag, så det blir jævla urettferdig.",
-    "2–2. Saltnes skrik på dommeren, men det hjelpe faen ikkje. Motstanderen får straffe uten grunn.",
-    "4–1 te Glimt. Pellegrino skyt så hardt at ballen går gjennom nettet og treff en supporter i trynet. Han takke for opplevelsen."
+    "{spiller} smell inn en suser fra 25 meter – keeperen renn heim til mora si.",
+    "{spiller} blir matchvinner – og hele jævla Tromsø hyle i skam.",
+    "Rosenborg ryke som vanlig, {spiller} danse på ruinan deres.",
+    "{spiller} score hat-trick – og dommeren besvime av ærefrykt.",
+    "Molde får smake ræv – {spiller} ordne opp som vanlig.",
+    "{spiller} smell inn vinnermålet på overtid. Publikum gå amok."
 ]
 
 spaadommer_random = [
@@ -35,55 +45,63 @@ intro = [
     "Troll-Tove føle noe... skummelt..."
 ]
 
-# Sti til fil for spådommer som allerede er gitt
-USED_PREDICTIONS_FILE = "used_predictions.json"
 
-def get_client_ip():
-    return request.remote_addr or "unknown"
+def hent_neste_glimt_kamp():
+    url = "https://v3.football.api-sports.io/fixtures"
+    headers = {"x-apisports-key": API_KEY}
+    params = {
+        "team": TEAM_ID,
+        "next": 1
+    }
+    response = requests.get(url, headers=headers, params=params)
+    data = response.json()
 
-def load_used_predictions():
-    if os.path.exists(USED_PREDICTIONS_FILE):
-        with open(USED_PREDICTIONS_FILE, "r") as file:
-            return json.load(file)
-    return {}
+    kamp = data['response'][0]
+    hjemmelag = kamp['teams']['home']['name']
+    bortelag = kamp['teams']['away']['name']
+    dato_str = kamp['fixture']['date']
+    dato = datetime.fromisoformat(dato_str.replace("Z", "+00:00")).strftime("%A %d. %B kl %H:%M")
 
-def save_used_predictions(data):
-    with open(USED_PREDICTIONS_FILE, "w") as file:
-        json.dump(data, file)
+    glimt_hjemme = hjemmelag.lower() == "bodø/glimt"
+    tilfeldig_spiller = random.choice(spillere_glimt)
+    base = random.choice(spaadommer_fotball).format(spiller=tilfeldig_spiller)
 
-def get_unique_prediction(ip, predictions):
-    used = load_used_predictions()
-    user_used = used.get(ip, [])
-    available = [p for p in predictions if p not in user_used]
+    resultat = f"Neste kamp: {hjemmelag} – {bortelag} ({dato}). {base}"
+    return resultat
 
-    if not available:
-        # Hvis alt er brukt, start på nytt
-        available = predictions
-        user_used = []
 
-    prediction = random.choice(available)
-    user_used.append(prediction)
-    used[ip] = user_used
-    save_used_predictions(used)
-    return prediction
+def hent_unikt_spadom(ip, sporsmal):
+    if any(ord in sporsmal.lower() for ord in ["glimt", "kamp", "eliteserien", "score"]):
+        kandidat = hent_neste_glimt_kamp()
+    else:
+        kandidat = random.choice(spaadommer_random)
+
+    forrige = ip_cache.get(ip)
+    while kandidat == forrige:
+        kandidat = random.choice(spaadommer_random)
+
+    ip_cache[ip] = kandidat
+    return kandidat
+
 
 @app.route("/", methods=["GET", "POST"])
 def troll_tove():
     spadom = ""
     intro_valg = ""
     sporsmal = ""
+
     if request.method == "POST":
         sporsmal = request.form["sporsmal"]
+        ip = request.remote_addr
         intro_valg = random.choice(intro)
-        ip = get_client_ip()
-        spm = sporsmal.lower()
 
-        if any(word in spm for word in ["glimt", "fotball", "kamp", "score", "mål", "eliteserien"]):
-            spadom = get_unique_prediction(ip, spaadommer_fotball)
-        else:
-            spadom = get_unique_prediction(ip, spaadommer_random)
+        try:
+            spadom = hent_unikt_spadom(ip, sporsmal)
+        except Exception as e:
+            spadom = f"Faen, æ fekk ikkje tak i kampdata: {str(e)}"
 
     return render_template("index.html", spadom=spadom, intro=intro_valg, sporsmal=sporsmal)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
