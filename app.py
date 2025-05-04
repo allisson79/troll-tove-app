@@ -1,7 +1,9 @@
 import os
+import json
 import random
+import hashlib
 import requests
-from flask import Flask, render_template, request
+from flask import Flask, request, render_template
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -9,15 +11,8 @@ load_dotenv()
 app = Flask(__name__)
 
 API_KEY = os.getenv("FOOTBALL_API_KEY")
-TEAM_ID_GLIMT = 327
-
-# Spådommer
-intro = [
-    "Hmm... la mæ føle litt på kraftan...",
-    "Vent no litt... æ må ta inn energian...",
-    "Oooh... det her kjennes mørkt ut...",
-    "Troll-Tove føle noe... skummelt..."
-]
+TEAM_ID = 327
+USED_PREDICTIONS_FILE = "used_predictions.json"
 
 spaadommer_random = [
     "Du kjem te å finne kjærligheten... bak Rema 1000... i en konteiner.",
@@ -29,71 +24,98 @@ spaadommer_random = [
 ]
 
 spaadommer_fotball = [
-    "Glimt vinn 2–1. Dommeren prøve å fucke det opp, men Pelle fikse biffen.",
-    "Det blir 1–1. En jævla dommertabbe og et mål av Evjen redda æra.",
-    "Faen ta, det her e kamp med krig. Glimt dreg det i land 3–2.",
-    "0–0. Ingen mål, bare spark og banning. Tromsø burde fått rødt kort alle sammen."
+    "Glimt maler ned motstand som møkk under skoen – det blir 3-1.",
+    "Det her e en kamp Glimt bare SKAL vinne – 2-0 og heim med skam for motstanderen.",
+    "Dommern kommer te å være blind, men Glimt vinn 1-0 likevel.",
+    "Æ ser mål... masse mål... og Glimt vinn 4-2."
 ]
 
-glimt_spillere = [
-    "Pellegrino", "Berg", "Saltnes", "Hauge", "Evjen", "Sjøvold", "Sørli", "Helmersen", "Haikin", "Bjørkan"
+spillere_glimt = [
+    "Julian Faye Lund", "Nikita Haikin", "Magnus Brøndbo", "Villads Nielsen",
+    "Odin Bjørtuft", "Haitam Aleesami", "Jostein Gundersen", "Fredrik Bjørkan",
+    "Brede Moe", "Fredrik Sjøvold", "Patrick Berg", "Sondre Auklend",
+    "Ulrik Saltnes", "Sondre Fet", "Håkon Evjen", "Jeppe Kjær",
+    "Kasper Høgh", "Jens Petter Hauge", "Ole Didrik Blomberg",
+    "Andreas Helmersen", "Daniel Bassi", "Isak Määttä", "Sondre Sørli",
+    "Mikkel Hansen"
 ]
 
+intro = [
+    "Hmm... la mæ føle litt på kraftan...",
+    "Vent no litt... æ må ta inn energian...",
+    "Oooh... det her kjennes mørkt ut...",
+    "Troll-Tove føle noe... skummelt..."
+]
 
-def neste_glimt_kamp():
+def get_user_hash(ip, question):
+    return hashlib.sha256(f"{ip}-{question}".encode()).hexdigest()
+
+def load_used_predictions():
+    if os.path.exists(USED_PREDICTIONS_FILE):
+        with open(USED_PREDICTIONS_FILE, 'r') as f:
+            return json.load(f)
+    return {}
+
+def save_used_predictions(data):
+    with open(USED_PREDICTIONS_FILE, 'w') as f:
+        json.dump(data, f)
+
+def get_unique_prediction(category_list, user_hash, used_data):
+    used = used_data.get(user_hash, [])
+    unused = [s for s in category_list if s not in used]
+    if not unused:
+        used_data[user_hash] = []
+        unused = category_list.copy()
+    choice = random.choice(unused)
+    used_data.setdefault(user_hash, []).append(choice)
+    return choice
+
+def hent_neste_glimt_kamp():
+    headers = {"X-RapidAPI-Key": API_KEY, "X-RapidAPI-Host": "api-football-v1.p.rapidapi.com"}
+    url = f"https://api-football-v1.p.rapidapi.com/v3/fixtures?team={TEAM_ID}&next=1"
     try:
-        url = f"https://v3.football.api-sports.io/fixtures?team={TEAM_ID_GLIMT}&next=1"
-        headers = {"x-apisports-key": API_KEY}
         response = requests.get(url, headers=headers)
-        response.raise_for_status()
-
         data = response.json()
-        fixture = data["response"][0]["fixture"]
-        teams = data["response"][0]["teams"]
-        hjemmelag = teams["home"]["name"]
-        bortelag = teams["away"]["name"]
-        dato = fixture["date"][:10]  # YYYY-MM-DD
-
-        glimt_hjemme = teams["home"]["id"] == TEAM_ID_GLIMT
-
-        resultat = random.choice([
-            "2–1", "3–2", "1–1", "4–0", "0–0", "2–2", "3–1", "1–0"
+        kamp = data['response'][0]['fixture']
+        motstander = data['response'][0]['teams']['away']['name'] if data['response'][0]['teams']['home']['id'] == TEAM_ID else data['response'][0]['teams']['home']['name']
+        hjemme = data['response'][0]['teams']['home']['id'] == TEAM_ID
+        dato = kamp['date'][:10]
+        resultat = random.choice(["2-1", "3-1", "4-2", "1-0", "3-2", "5-1"])
+        målscorer = random.choice(spillere_glimt)
+        sidekommentar = random.choice([
+            "dommern e faen ikkje edru.",
+            "supporteran til motstanderan går heim i stillhet.",
+            "æ ser rødt kort og banning.",
+            "det blir drama og jævelskap."
         ])
-        målscorer = random.choice(glimt_spillere)
-
-        svar = (
-            f"Neste kamp: {hjemmelag} – {bortelag} ({dato}).\n"
-            f"Troll-Tove spår resultatet blir {resultat}. Og {målscorer} smell inn ett som får publikum te å skrik av ekstase."
-        )
-
-        if not glimt_hjemme:
-            svar += "\nDet blir krig på bortebane – men Glimt står han av."
-
-        return svar
+        return f"Neste kamp mot {motstander} ({'hjemme' if hjemme else 'borte'}) {dato}. Glimt vinn {resultat} – og {målscorer} banka inn minst ett. Og {sidekommentar}"
     except Exception as e:
         return f"Faen, æ fekk ikkje tak i kampdata: {str(e)}"
-
 
 @app.route("/", methods=["GET", "POST"])
 def troll_tove():
     spadom = ""
-    intro_valg = ""
+    intro_valg = random.choice(intro)
     sporsmal = ""
+    used_data = load_used_predictions()
 
     if request.method == "POST":
         sporsmal = request.form["sporsmal"]
-        intro_valg = random.choice(intro)
+        user_ip = request.remote_addr or "anon"
+        user_hash = get_user_hash(user_ip, sporsmal)
         spm = sporsmal.lower()
 
-        if any(word in spm for word in ["kamp", "neste kamp", "glimt", "fotball", "score", "mål"]):
-            spadom = neste_glimt_kamp()
-        elif any(word in spm for word in ["kjærlighet", "elske", "forhold"]):
-            spadom = random.choice(spaadommer_random)
+        if any(word in spm for word in ["kamp", "glimt", "score", "mål", "vinner"]):
+            if "neste kamp" in spm or "hvem møter" in spm:
+                spadom = hent_neste_glimt_kamp()
+            else:
+                spadom = get_unique_prediction(spaadommer_fotball, user_hash, used_data)
         else:
-            spadom = random.choice(spaadommer_random)
+            spadom = get_unique_prediction(spaadommer_random, user_hash, used_data)
+
+        save_used_predictions(used_data)
 
     return render_template("index.html", spadom=spadom, intro=intro_valg, sporsmal=sporsmal)
-
 
 if __name__ == "__main__":
     app.run(debug=True)
