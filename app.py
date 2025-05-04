@@ -2,41 +2,24 @@ from flask import Flask, render_template, request
 from dotenv import load_dotenv
 import os
 import random
-from datetime import datetime
 from ipaddress import ip_address
 
 load_dotenv()
 
 app = Flask(__name__)
 
+# Caching spådommer basert på IP
 ip_cache = {}
-API_KEY = os.getenv("API_FOOTBALL_KEY")
-TEAM_ID = 5412
-BASE_URL = "https://v3.football.api-sports.io"
 
-headers = {
-    "x-apisports-key": API_KEY
-}
+# Last inn spådommer fra filer
+with open("spaadommer_fotball.txt", encoding="utf-8") as f:
+    football_predictions = [line.strip() for line in f if line.strip()]
 
-# Last inn spådommer fra fil
-def load_predictions(filepath):
-    try:
-        with open(filepath, "r", encoding="utf-8") as f:
-            return [line.strip() for line in f if line.strip()]
-    except Exception:
-        return []
+with open("spaadommer_random.txt", encoding="utf-8") as f:
+    random_predictions = [line.strip() for line in f if line.strip()]
 
-fotball_spaadommer = load_predictions("spaadommer_fotball.txt")
-tull_spaadommer = load_predictions("spaadommer_random.txt")
-alle_spaadommer = fotball_spaadommer + tull_spaadommer
-
-def generate_prediction(sporsmal):
-    sporsmal = sporsmal.lower()
-
-    if "glimt" in sporsmal or "kamp" in sporsmal:
-        if fotball_spaadommer:
-            return random.choice(fotball_spaadommer)
-    return random.choice(alle_spaadommer) if alle_spaadommer else "Æ har faen ikke noe å si te dæ akkurat no."
+# Enkle fotballnøkkelord for å avgjøre type spørsmål
+fotballord = ["glimt", "kamp", "score", "scorer", "mål", "saltnes", "spill", "fotball", "aspmyra"]
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -44,18 +27,20 @@ def index():
     ip_key = str(ip_address(user_ip.split(",")[0].strip()))
 
     if request.method == "POST":
-        navn = request.form.get("navn", "ukjent tosk")
-        sporsmal = request.form.get("sporsmal", "").strip()
+        sporsmal = request.form.get("sporsmal", "")
+        navn = request.form.get("navn", "Din idiot")
 
         if ip_key in ip_cache:
-            spadom = ip_cache[ip_key]
+            prediction = ip_cache[ip_key]
         else:
-            spadom = generate_prediction(sporsmal)
-            ip_cache[ip_key] = spadom
+            lavere_sporsmal = sporsmal.lower()
+            if any(ord in lavere_sporsmal for ord in fotballord):
+                prediction = random.choice(football_predictions)
+            else:
+                prediction = random.choice(random_predictions)
+            ip_cache[ip_key] = prediction
 
         intro = f"Hør hør, {navn}! Troll-Tove har kikka i kula si…"
-
-        return render_template("result.html", sporsmal=sporsmal, spadom=spadom, intro=intro)
+        return render_template("result.html", spadom=prediction, sporsmal=sporsmal, intro=intro)
 
     return render_template("index.html")
-
