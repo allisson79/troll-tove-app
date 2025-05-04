@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <title>Troll-Tove Spåkone</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #fdf0f0;
+            color: #222;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            max-width: 700px;
+            margin: auto;
+        }
+        input, button {
+            padding: 12px;
+            font-size: 16px;
+            margin-top: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        button {
+            background-color: darkred;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .toggle-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .toggle-buttons form {
+            flex: 1;
+        }
+        .result {
+            margin-top: 30px;
+            font-size: 20px;
+            color: darkgreen;
+        }
+        .header {
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">🔮 Troll-Tove sin Spåkrok 🔮</div>
+
+        <div class="toggle-buttons">
+            <form method="POST" action="/toggle_dark_mode">
+                <button type="submit">🌑 Dark Mode</button>
+            </form>
+            <form method="POST" action="/toggle_glimt_mode">
+                <button type="submit">💛 Glimt-modus</button>
+            </form>
+        </div>
+
+        <form method="POST" style="margin-top: 20px;">
+            <input type="text" name="navn" placeholder="Ka heite du, din forbanna dust?" required><br>
+            <input type="text" name="sporsmal" placeholder="Ka vil du vite? F.eks 'Når spille Glimt?' " required><br>
+            <button type="submit">Spå mæ, Tove!</button>
+        </form>
+
+        {% if spadom %}
+        <div class="result">
+            <p><strong>Du spurte:</strong> <em>{{ sporsmal }}</em></p>
+            <p><strong>{{ intro }}</strong></p>
+            <p><strong>Svaret fra Troll-Tove:</strong></p>
+            <p>💀 {{ spadom }} 💀</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
