@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <title>Troll-Tove Spådde</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #fdf0f0;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            max-width: 700px;
+            margin: auto;
+        }
+        .result {
+            margin-top: 30px;
+            font-size: 20px;
+            color: darkgreen;
+        }
+        .header {
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            background-color: darkred;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">🔮 Troll-Tove har spådd! 🔮</div>
+        <div class="result">
+            <p><strong>Du spurte:</strong> <em>{{ sporsmal }}</em></p>
+            <p><strong>{{ intro }}</strong></p>
+            <p><strong>Svaret fra Troll-Tove:</strong></p>
+            <p>💀 {{ spadom }} 💀</p>
+        </div>
+        <form action="/" method="get">
+            <button type="submit">Still et nytt spørsmål</button>
+        </form>
+    </div>
+</body>
+</html>
