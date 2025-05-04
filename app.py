@@ -1,60 +1,47 @@
-from flask import Flask, render_template, request
+from flask import Flask, render\_template, request
+from dotenv import load\_dotenv
+import os
 import random
 import requests
-import os
 from datetime import datetime
-from dotenv import load_dotenv
+from collections import defaultdict
 
 load\_dotenv()
 
 app = Flask(**name**)
 
-API\_KEY = os.getenv("API\_FOOTBALL\_KEY")
-TEAM\_ID = 327  # Bodø/Glimt
+API\_KEY = os.getenv("API\_KEY")
+TEAM\_ID = 327  # Bodø/Glimt sin ID
 
 spillere\_glimt = \[
 "Julian", "Nikita", "Magnus", "Villads", "Odin", "Haitam", "Jostein",
-"Fredrik", "Brede", "Fredrik", "Patrick", "Sondre", "Ulrik", "Sondre",
-"Håkon", "Jeppe", "Kasper", "Jens", "Ole", "Andreas", "Daniel", "Isak",
-"Sondre", "Mikkel"
+"Fredrik", "Brede", "Patrick", "Sondre", "Ulrik", "Jeppe", "Håkon",
+"Kasper", "Jens", "Ole", "Andreas", "Daniel", "Isak", "Mikkel"
 ]
 
-spaaprosaver = \[
-"{spiller} smell inn to mål før pause og setter fyr på Aspmyra.",
-"{spiller} klinke inn vinnermålet i det 89. minuttet – og publikum eksplodere!",
-"{spiller} skyt så hardt at keeperen må sy syv sting bak øret.",
-"Det blir 2–1, og {spiller} e helten som vanlig.",
-"1–1, men {spiller} redder poeng med en frekk lobb.",
-"3–2 te Glimt – {spiller} score hattrick og tar æra aleina.",
-"{spiller} starta på benken men byttes inn og avgjør. Helt Texas!",
-"{spiller} scorer fra midtbanen. Kommentatoren klikker.",
-"0–0, men {spiller} gjør en tunnel så frekk at hele benken blir rød i trynet.",
-"2–0, og {spiller} feire med å hoppe opp på taket av kiosken."
+spaadommer\_fotball = \[
+"{spiller} smell inn et mål fra 30 meter.",
+"{spiller} sklitakle ballen i mål – og dommern dømme straffe!",
+"{spiller} score me ræva, men mål e mål.",
+"Det e klart som faen – {spiller} sett den i krysset.",
+"{spiller} bombe, men så kommer returen og da e det ingen nåde.",
+"{spiller} står rett – og bare prikke inn seiersmålet.",
+"{spiller} e i fyr og flamme – minst to mål!",
+"Publikum rope på {spiller} – og han levere."
 ]
 
-spaaprosatull = \[
-"Du får ikke svaret nu – æ høre på radio.",
-"Ligg unna sånne spørsmål, dæm bringe ulykke.",
-"Æ ser bare tåke... og en Rosenborg-supporter som gråte.",
-"Det blir enten seier, tap, eller uavgjort – æ e ikke Gud!",
-"Kaffesumpen min eksploderte akkurat – still spørsmålet på nytt.",
-"Æ kan spå kjærlighet og død – men ikke odds.",
-"Må æ virkelig spå fotball heile tia? Skaff dæ et liv.",
-"Du spør om Glimt, men æ ser bare Molde sine tårer.",
-"Dommeren avgjør – som vanlig – og æ ser fusk i horisonten.",
-"En fuggel viska mæ i øret: Glimt vinne, men æ trur han ljug.",
-"Du e for utålmodig. Kom tebake når du har ofra en wienerpølse."
+spaadommer\_annet = \[
+"Du burde hold kjeft neste møte – universet advare.",
+"Kjærligheta blomstre... men kanskje ikke for dæ.",
+"Peng får du, men regningan spring fortere.",
+"Du vinne i Lotto – men miste lappen samme uka.",
+"Hold dæ unna fisk idag, det blir bare bein.",
+"Nån sladre om dæ. Kanskje ho Linda fra regnskap?",
+"Det blir en dag med motvind. I alle retninga.",
+"Gammel flamme tar kontakt. Bruk brannslukkingsapparat."
 ]
 
-introtekster = \[
-"Oooh... la mæ føle litt på kraftan...",
-"Det lukta svette og faenskap... det blir et svar nu.",
-"Æ rope ut i evigheta... og noe rope tilbake.",
-"Kaffen koka, runene blinke... no skjer det.",
-"Universet rasle – Troll-Tove lytte.",
-"Hold kjeft og hør – æ har kontakt med mørket.",
-"Noe kommer... det e sterkt... det e frekt... det e svar!"
-]
+ip\_logg = defaultdict(set)
 
 def hent\_neste\_glimt\_kamp():
 url = "[https://v3.football.api-sports.io/fixtures](https://v3.football.api-sports.io/fixtures)"
@@ -63,12 +50,12 @@ params = {
 "team": TEAM\_ID,
 "next": 1
 }
-try:
 response = requests.get(url, headers=headers, params=params)
 data = response.json()
-kamp = data\['response']\[0]
 
 ```
+try:
+    kamp = data['response'][0]
     hjemmelag = kamp['teams']['home']['name']
     bortelag = kamp['teams']['away']['name']
     dato_str = kamp['fixture']['date']
@@ -76,34 +63,40 @@ kamp = data\['response']\[0]
 
     glimt_hjemme = hjemmelag.lower() == "bodø/glimt"
     tilfeldig_spiller = random.choice(spillere_glimt)
-    base = random.choice(spaaprosaver).format(spiller=tilfeldig_spiller)
+    base = random.choice(spaadommer_fotball).format(spiller=tilfeldig_spiller)
 
     resultat = f"Neste kamp: {hjemmelag} – {bortelag} ({dato}). {base}"
     return resultat
 
-except Exception as e:
-    return f"Faen, æ fekk ikkje tak i kampdata: {str(e)}"
+except (IndexError, KeyError):
+    return "Faen, æ fekk ikkje tak i kampdata: list index out of range"
 ```
 
-@app.route("/", methods=\["GET", "POST"])
-def troll\_tove():
-spadom = ""
-intro\_valg = ""
-sporsmal = ""
+def generer\_spaadom(sporsmal, bruker\_ip):
+sporsmal\_lower = sporsmal.lower()
 
 ```
-if request.method == "POST":
-    sporsmal = request.form.get("sporsmal", "")
-    intro_valg = random.choice(introtekster)
-    spm = sporsmal.lower()
+if bruker_ip in ip_logg and sporsmal in ip_logg[bruker_ip]:
+    return "Du har spurt det der før, din nysgjerrige jævel. Prøv på nytt med nåkka annet."
 
-    if "kamp" in spm or "neste kamp" in spm or "score" in spm:
-        spadom = hent_neste_glimt_kamp()
-    elif any(word in spm for word in ["glimt", "bodø", "fotball", "eliteserien", "rosenborg", "molde", "tromsø", "til", "rbk"]):
-        spiller = random.choice(spillere_glimt)
-        spadom = random.choice(spaaprosaver).format(spiller=spiller)
-    else:
-        spadom = random.choice(spaaprosatull)
+ip_logg[bruker_ip].add(sporsmal)
 
-return render_template("index.html", spadom=spadom, intro=intro_valg, sporsmal=sporsmal)
+if any(ord for ord in ["glimt", "bodø", "score", "mål", "kamp"] if ord in sporsmal_lower):
+    return hent_neste_glimt_kamp()
+else:
+    return random.choice(spaadommer_annet)
 ```
+
+@app.route('/', methods=\['GET', 'POST'])
+def index():
+spadom = None
+sporsmal = None
+if request.method == 'POST':
+navn = request.form\['navn']
+sporsmal = request.form\['sporsmal']
+bruker\_ip = request.remote\_addr
+spadom = generer\_spaadom(sporsmal, bruker\_ip)
+return render\_template('index.html', spadom=spadom, sporsmal=sporsmal)
+
+if **name** == '**main**':
+app.run(debug=True)
