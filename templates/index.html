@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -8,7 +7,6 @@
         body {
             font-family: 'Arial', sans-serif;
             background-color: #fdf0f0;
-            color: #222;
             text-align: center;
             padding: 50px;
         }
@@ -20,13 +18,15 @@
             max-width: 700px;
             margin: auto;
         }
-        input, button {
+        input, button, .mode-button {
             padding: 12px;
             font-size: 16px;
             margin-top: 10px;
             width: 100%;
             border: 1px solid #ccc;
             border-radius: 6px;
+            text-decoration: none;
+            display: block;
         }
         button {
             background-color: darkred;
@@ -34,19 +34,14 @@
             font-weight: bold;
             cursor: pointer;
         }
-        .toggle-buttons {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-top: 10px;
+        .mode-button {
+            background-color: #333;
+            color: #fff;
+            font-weight: bold;
         }
-        .toggle-buttons form {
-            flex: 1;
-        }
-        .result {
-            margin-top: 30px;
-            font-size: 20px;
-            color: darkgreen;
+        .glimt-button {
+            background-color: gold;
+            color: #000;
         }
         .header {
             font-size: 30px;
@@ -58,29 +53,14 @@
     <div class="container">
         <div class="header">🔮 Troll-Tove sin Spåkrok 🔮</div>
 
-        <div class="toggle-buttons">
-            <form method="POST" action="/toggle_dark_mode">
-                <button type="submit">🌑 Dark Mode</button>
-            </form>
-            <form method="POST" action="/toggle_glimt_mode">
-                <button type="submit">💛 Glimt-modus</button>
-            </form>
-        </div>
-
-        <form method="POST" style="margin-top: 20px;">
+        <form method="POST">
             <input type="text" name="navn" placeholder="Ka heite du, din forbanna dust?" required><br>
             <input type="text" name="sporsmal" placeholder="Ka vil du vite? F.eks 'Når spille Glimt?' " required><br>
             <button type="submit">Spå mæ, Tove!</button>
         </form>
 
-        {% if spadom %}
-        <div class="result">
-            <p><strong>Du spurte:</strong> <em>{{ sporsmal }}</em></p>
-            <p><strong>{{ intro }}</strong></p>
-            <p><strong>Svaret fra Troll-Tove:</strong></p>
-            <p>💀 {{ spadom }} 💀</p>
-        </div>
-        {% endif %}
+        <a href="/glimtmodus" class="mode-button glimt-button">⚽ Glimt-modus</a>
+        <a href="/darkmodus" class="mode-button">🌒 Dark-modus</a>
     </div>
 </body>
 </html>
