@@ -2,7 +2,11 @@
 
 En norsk spåkone-app med humor, spesielt for Bodø/Glimt-fans! Troll-Tove gir spådommer om fotball og livet generelt.
 
-**🚀 Vil du publisere appen online? Se [DEPLOYMENT.md](DEPLOYMENT.md) for komplett guide!**
+## 🚀 Publish Online (Quick Start)
+
+**Want to publish online in 5 minutes?** → See [QUICK_DEPLOY.md](QUICK_DEPLOY.md)
+
+**Need detailed guide for other platforms?** → See [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ## Funksjoner
 
