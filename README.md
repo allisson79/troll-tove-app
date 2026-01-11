@@ -26,10 +26,18 @@ En norsk spåkone-app med humor, spesielt for Bodø/Glimt-fans! Troll-Tove gir s
 
 ### Quick Start (Anbefalt)
 
+**Linux/macOS:**
 ```bash
 git clone https://github.com/allisson79/troll-tove-app.git
 cd troll-tove-app
 ./start.sh
+```
+
+**Windows:**
+```cmd
+git clone https://github.com/allisson79/troll-tove-app.git
+cd troll-tove-app
+start.bat
 ```
 
 Scriptet vil automatisk:
