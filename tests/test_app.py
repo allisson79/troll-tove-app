@@ -1,10 +1,6 @@
-import os
-import sys
 from unittest.mock import patch
 
 import pytest
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app import app, fotball_spaadommer, ip_cache, random_spaadommer
 
@@ -16,20 +12,20 @@ def clear_ip_cache():
     ip_cache.clear()
 
 
-def test_index_get_renders_form():
+@pytest.fixture
+def client():
     app.config.update({"TESTING": True})
-    client = app.test_client()
+    return app.test_client()
 
+
+def test_index_get_renders_form(client):
     response = client.get("/")
 
     assert response.status_code == 200
     assert "Troll-Tove sin Spåkrok".encode("utf-8") in response.data
 
 
-def test_post_caches_prediction_per_ip():
-    app.config.update({"TESTING": True})
-    client = app.test_client()
-
+def test_post_caches_prediction_per_ip(client):
     with patch("app.random.choice", side_effect=["spadom1", "spadom2"]) as mock_choice:
         first = client.post(
             "/",
@@ -49,10 +45,7 @@ def test_post_caches_prediction_per_ip():
     assert mock_choice.call_count == 1
 
 
-def test_glimtmodus_uses_fotball_predictions():
-    app.config.update({"TESTING": True})
-    client = app.test_client()
-
+def test_glimtmodus_uses_fotball_predictions(client):
     with patch("app.random.choice", return_value="fotball-spadom") as mock_choice:
         response = client.get("/glimtmodus")
 
@@ -61,10 +54,7 @@ def test_glimtmodus_uses_fotball_predictions():
     mock_choice.assert_called_once_with(fotball_spaadommer)
 
 
-def test_darkmodus_uses_random_predictions():
-    app.config.update({"TESTING": True})
-    client = app.test_client()
-
+def test_darkmodus_uses_random_predictions(client):
     with patch("app.random.choice", return_value="random-spadom") as mock_choice:
         response = client.get("/darkmodus")
 
