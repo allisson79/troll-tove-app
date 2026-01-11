@@ -2,53 +2,16 @@
 <html lang="no">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 - Ikkje funne</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #1a1a1a;
-            color: #fff;
-            text-align: center;
-            padding: 50px;
-        }
-        .container {
-            background-color: #2a2a2a;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(255,255,255,0.2);
-            max-width: 700px;
-            margin: auto;
-        }
-        .error-code {
-            font-size: 72px;
-            color: darkred;
-            margin: 20px 0;
-        }
-        .message {
-            font-size: 24px;
-            margin: 20px 0;
-        }
-        a {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 10px 20px;
-            background-color: darkred;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-        }
-        a:hover {
-            background-color: #a00000;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body class="dark">
     <div class="container">
         <div class="error-code">404</div>
-        <div class="message">🔮 Troll-Tove finner ikkje denne sida 🔮</div>
+        <h1 class="message">🔮 Troll-Tove finner ikkje denne sida 🔮</h1>
         <p>Sida du leita etter eksistere ikkje... Kanskje den va bare en spådom?</p>
-        <a href="/">Tilbake te Troll-Tove</a>
+        <a href="/" class="back-button">Tilbake te Troll-Tove</a>
     </div>
 </body>
 </html>

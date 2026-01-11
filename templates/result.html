@@ -2,57 +2,31 @@
 <html lang="no">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Troll-Tove har spådd! Se hva framtida bringer.">
     <title>Troll-Tove har spådd!</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #1a1a1a;
-            color: #fff;
-            text-align: center;
-            padding: 50px;
-        }
-        .container {
-            background-color: #2a2a2a;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(255,255,255,0.2);
-            max-width: 700px;
-            margin: auto;
-        }
-        .result {
-            margin-top: 20px;
-            font-size: 20px;
-            color: lightgreen;
-        }
-        a {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 10px 20px;
-            background-color: darkred;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-        }
-        a:hover {
-            background-color: #a00000;
-        }
-        .header {
-            font-size: 28px;
-            margin-bottom: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body class="dark">
     <div class="container">
-        <div class="header">🔮 Troll-Tove har spådd! 🔮</div>
-        <div class="result">
+        <img src="{{ url_for('static', filename='troill tove.jpg') }}" alt="Troll-Tove" class="troll-image">
+        <h1 class="header">🔮 Troll-Tove har spådd! 🔮</h1>
+        
+        <div class="result" role="main" aria-live="polite">
             <p><strong>Du spurte:</strong> <em>{{ sporsmal }}</em></p>
             <p><strong>{{ intro }}</strong></p>
             <p><strong>Svaret fra Troll-Tove:</strong></p>
-            <p>💀 {{ spadom }} 💀</p>
+            <div class="prediction-text">
+                💀 {{ spadom }} 💀
+            </div>
         </div>
-        <a href="/">Still et nytt spørsmål</a>
+        
+        <div class="action-buttons">
+            <a href="/" class="back-button" aria-label="Still et nytt spørsmål">🔮 Still et nytt spørsmål</a>
+            <button id="shareButton" class="share-button" aria-label="Del spådommen">📤 Del spådommen</button>
+        </div>
     </div>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
