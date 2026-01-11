@@ -11,8 +11,7 @@ class TrollToveTestCase(unittest.TestCase):
         """Set up test client"""
         self.app = app
         self.app.config['TESTING'] = True
-        # Note: test_client() may have issues with older Werkzeug versions
-        # These tests verify the core logic instead
+        self.client = self.app.test_client()
     
     def test_prediction_cache(self):
         """Test PredictionCache functionality"""
@@ -55,6 +54,74 @@ class TrollToveTestCase(unittest.TestCase):
         self.assertIn('/health', rules)
         self.assertIn('/glimtmodus', rules)
         self.assertIn('/darkmodus', rules)
+    
+    def test_index_page_loads(self):
+        """Test that index page loads successfully"""
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Troll-Tove sin Sp\xc3\xa5krok', response.data)
+    
+    def test_glimtmodus_loads(self):
+        """Test that Glimt mode loads successfully"""
+        response = self.client.get('/glimtmodus')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Troll-Tove har sp\xc3\xa5dd!', response.data)
+    
+    def test_darkmodus_loads(self):
+        """Test that Dark mode loads successfully"""
+        response = self.client.get('/darkmodus')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Troll-Tove har sp\xc3\xa5dd!', response.data)
+    
+    def test_health_endpoint(self):
+        """Test health check endpoint"""
+        response = self.client.get('/health')
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertEqual(data['status'], 'healthy')
+        self.assertIn('fotball_predictions', data)
+        self.assertIn('random_predictions', data)
+        self.assertGreater(data['fotball_predictions'], 0)
+        self.assertGreater(data['random_predictions'], 0)
+    
+    def test_form_submission(self):
+        """Test form submission with valid data"""
+        response = self.client.post('/', data={
+            'navn': 'Test User',
+            'sporsmal': 'Test question?'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Troll-Tove har sp\xc3\xa5dd!', response.data)
+        self.assertIn(b'Test User', response.data)
+    
+    def test_form_validation(self):
+        """Test that form handles empty/invalid input"""
+        # Empty name should default to "Du"
+        response = self.client.post('/', data={
+            'navn': '',
+            'sporsmal': 'Test?'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Du', response.data)
+    
+    def test_404_error_page(self):
+        """Test 404 error page"""
+        response = self.client.get('/nonexistent-page')
+        self.assertEqual(response.status_code, 404)
+        self.assertIn(b'404', response.data)
+        self.assertIn(b'Troll-Tove finner ikkje denne sida', response.data)
+    
+    def test_static_files_exist(self):
+        """Test that static files are accessible"""
+        # Test CSS file
+        response = self.client.get('/static/style.css')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Troll-Tove', response.data)
+        
+        # Test JavaScript file
+        response = self.client.get('/static/script.js')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'showToast', response.data)
 
 
 if __name__ == '__main__':
