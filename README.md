@@ -75,6 +75,10 @@ gunicorn -w 4 -b 0.0.0.0:8000 app:app
 - LRU cache med timeout for å unngå minnelekkasje
 - Debug mode er disabled i produksjon
 - Secret key for Flask sessions
+- **VIKTIG**: `.env` filen er tracked i repo for convenience, men ALDRI commit ekte secrets! I produksjon:
+  - Bruk environment variabler eller en secrets manager
+  - Generer en sterk SECRET_KEY: `python -c "import secrets; print(secrets.token_hex(32))"`
+  - Bruk en ekte API-nøkkel hvis du trenger den
 
 ## Testing
 

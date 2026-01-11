@@ -2,6 +2,7 @@
 Simple tests for Troll-Tove Flask app
 """
 import unittest
+import time
 from app import app, PredictionCache
 
 
@@ -36,7 +37,6 @@ class TrollToveTestCase(unittest.TestCase):
     
     def test_prediction_cache_timeout(self):
         """Test cache timeout"""
-        import time
         cache = PredictionCache(max_size=10, timeout=1)
         
         cache.set("192.168.1.1", "Test prediction")

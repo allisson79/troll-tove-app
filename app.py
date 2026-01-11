@@ -14,7 +14,19 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+
+# Get SECRET_KEY from environment or generate a random one for development
+secret_key = os.getenv('SECRET_KEY')
+if not secret_key:
+    if os.getenv('FLASK_DEBUG', 'False').lower() == 'true':
+        # Generate a random key for development
+        import secrets
+        secret_key = secrets.token_hex(32)
+        logger.warning("Using randomly generated SECRET_KEY for development. Set SECRET_KEY in .env for production!")
+    else:
+        raise ValueError("SECRET_KEY must be set in production. Add it to your .env file.")
+
+app.config['SECRET_KEY'] = secret_key
 
 # LRU Cache for IP-based predictions with timeout
 class PredictionCache:
