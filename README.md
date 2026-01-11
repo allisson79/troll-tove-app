@@ -2,6 +2,12 @@
 
 En norsk spåkone-app med humor, spesielt for Bodø/Glimt-fans! Troll-Tove gir spådommer om fotball og livet generelt.
 
+## 🚀 Publish Online (Quick Start)
+
+**Want to publish online in 5 minutes?** → See [QUICK_DEPLOY.md](QUICK_DEPLOY.md)
+
+**Need detailed guide for other platforms?** → See [DEPLOYMENT.md](DEPLOYMENT.md)
+
 ## Funksjoner
 
 - **Hovedmodus**: Spør Troll-Tove om hva som helst
@@ -17,6 +23,30 @@ En norsk spåkone-app med humor, spesielt for Bodø/Glimt-fans! Troll-Tove gir s
 - Gunicorn for produksjon
 
 ## Installasjon
+
+### Quick Start (Anbefalt)
+
+**Linux/macOS:**
+```bash
+git clone https://github.com/allisson79/troll-tove-app.git
+cd troll-tove-app
+./start.sh
+```
+
+**Windows:**
+```cmd
+git clone https://github.com/allisson79/troll-tove-app.git
+cd troll-tove-app
+start.bat
+```
+
+Scriptet vil automatisk:
+- Opprette `.env` fil med tilfeldig SECRET_KEY
+- Sette opp virtuelt miljø
+- Installere avhengigheter
+- Starte appen på `http://localhost:5000`
+
+### Manuell Installasjon
 
 1. Klon repositoryet:
 ```bash
@@ -92,6 +122,44 @@ Test health endpoint:
 ```bash
 curl http://localhost:5000/health
 ```
+
+## Publisering / Deployment 🚀
+
+Vil du publisere Troll-Tove på internett? Vi har laget en komplett guide!
+
+### Quick Start - Render.com (Anbefalt)
+
+Den enkleste måten å publisere appen:
+
+1. Opprett gratis konto på [render.com](https://render.com)
+2. Klikk "New +" → "Web Service"
+3. Koble til dette GitHub-repositoryet
+4. Render vil automatisk bruke `render.yaml` konfigurasjon
+5. Sett miljøvariabel `SECRET_KEY` (Render kan generere dette)
+6. Klikk "Create Web Service"
+7. Din app er nå live på internett! 🎉
+
+### Andre Plattformer
+
+Appen kan også publiseres på:
+- **Heroku** (etablert plattform, mange add-ons)
+- **Railway.app** (moderne, god utvikleropplevelse)
+- **Vercel** (serverless, edge deployment)
+
+### Detaljert Guide
+
+Se [DEPLOYMENT.md](DEPLOYMENT.md) for:
+- Steg-for-steg instruksjoner for alle plattformer
+- Miljøvariabel-oppsett
+- Feilsøking
+- Kostnadssammenligning
+- Post-deployment sjekkliste
+
+### Nødvendige Miljøvariabler
+
+For produksjon, sett disse:
+- `SECRET_KEY` - Generer med: `python -c "import secrets; print(secrets.token_hex(32))"`
+- `FLASK_DEBUG` - Sett til `false`
 
 ## Lisens
 
