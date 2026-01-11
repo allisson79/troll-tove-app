@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="crystalGrad" cx="50%" cy="40%">
+      <stop offset="0%" style="stop-color:#e0d4f7;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9b7eed;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6a4c93;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="shine" cx="35%" cy="35%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Base stand -->
+  <ellipse cx="50" cy="85" rx="25" ry="8" fill="#8b0000"/>
+  
+  <!-- Crystal ball -->
+  <circle cx="50" cy="50" r="35" fill="url(#crystalGrad)" stroke="#4a0072" stroke-width="2"/>
+  
+  <!-- Shine effect -->
+  <circle cx="40" cy="40" r="15" fill="url(#shine)"/>
+  
+  <!-- Inner glow -->
+  <circle cx="50" cy="50" r="20" fill="none" stroke="#d8c3f0" stroke-width="1" opacity="0.5"/>
+</svg>
