@@ -8,7 +8,11 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', function(e) {
             const button = form.querySelector('button[type="submit"]');
             if (button) {
-                button.innerHTML = '<div class="spinner"></div>';
+                // Create spinner element using DOM methods
+                const spinner = document.createElement('div');
+                spinner.className = 'spinner';
+                button.textContent = '';
+                button.appendChild(spinner);
                 button.disabled = true;
             }
         });
@@ -41,20 +45,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Copy text to clipboard
+// Copy text to clipboard - prioritize modern API
 function copyToClipboard(text) {
+    // Modern Clipboard API (preferred method)
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(() => {
             showToast('Spådommen er kopiert til utklippstavla!');
         }).catch(() => {
+            // Fallback to deprecated method only if modern API fails
             fallbackCopyToClipboard(text);
         });
     } else {
+        // Use deprecated method only for very old browsers
         fallbackCopyToClipboard(text);
     }
 }
 
-// Fallback copy method for older browsers
+// Fallback copy method for older browsers (deprecated)
 function fallbackCopyToClipboard(text) {
     const textarea = document.createElement('textarea');
     textarea.value = text;
@@ -64,6 +71,7 @@ function fallbackCopyToClipboard(text) {
     textarea.select();
     
     try {
+        // Note: document.execCommand is deprecated but kept as fallback for old browsers
         document.execCommand('copy');
         showToast('Spådommen er kopiert til utklippstavla!');
     } catch (err) {
