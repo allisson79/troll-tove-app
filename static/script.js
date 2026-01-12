@@ -5,15 +5,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
     
     if (form) {
-        form.addEventListener('submit', function(e) {
-            const button = form.querySelector('button[type="submit"]');
-            if (button) {
+        form.addEventListener('submit', function(event) {
+            const submitButton = form.querySelector('button[type="submit"]');
+            if (submitButton) {
                 // Create spinner element using DOM methods
                 const spinner = document.createElement('div');
                 spinner.className = 'spinner';
-                button.textContent = '';
-                button.appendChild(spinner);
-                button.disabled = true;
+                submitButton.textContent = '';
+                submitButton.appendChild(spinner);
+                submitButton.disabled = true;
             }
         });
     }
@@ -22,23 +22,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const shareButton = document.getElementById('shareButton');
     if (shareButton) {
         shareButton.addEventListener('click', function() {
-            const predictionText = document.querySelector('.prediction-text');
-            if (predictionText) {
-                const text = predictionText.textContent.trim();
+            const predictionTextElement = document.querySelector('.prediction-text');
+            if (predictionTextElement) {
+                const predictionText = predictionTextElement.textContent.trim();
                 
                 // Try to use Web Share API if available
                 if (navigator.share) {
                     navigator.share({
                         title: 'Troll-Tove Spådom',
-                        text: text,
+                        text: predictionText,
                         url: window.location.href
                     }).catch(() => {
                         // Fallback to clipboard
-                        copyToClipboard(text);
+                        copyToClipboard(predictionText);
                     });
                 } else {
                     // Fallback to clipboard
-                    copyToClipboard(text);
+                    copyToClipboard(predictionText);
                 }
             }
         });
@@ -74,7 +74,7 @@ function fallbackCopyToClipboard(text) {
         // Note: document.execCommand is deprecated but kept as fallback for old browsers
         document.execCommand('copy');
         showToast('Spådommen er kopiert til utklippstavla!');
-    } catch (err) {
+    } catch (error) {
         showToast('Kunne ikke kopiere teksten. Prøv igjen!');
     }
     
