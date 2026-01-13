@@ -40,6 +40,7 @@
     --color-dark-success: #86efac;
     
     /* Spacing Scale */
+    --space-xxs: 6px;
     --space-xs: 8px;
     --space-sm: 12px;
     --space-md: 16px;
@@ -49,6 +50,7 @@
     
     /* Typography Scale */
     --font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Avenir Next', 'Avenir', sans-serif;
+    --font-size-xs: 0.8125rem;
     --font-size-sm: 0.875rem;
     --font-size-base: 1rem;
     --font-size-lg: 1.125rem;
@@ -153,7 +155,7 @@ body[data-theme="dark"]::before {
     z-index: 1000;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-xxs);
     font-weight: var(--font-weight-medium);
     color: var(--color-text);
 }
@@ -632,8 +634,8 @@ body[data-theme="dark"] .prediction-text {
     .theme-toggle {
         top: var(--space-sm);
         right: var(--space-sm);
-        padding: 6px var(--space-xs);
-        font-size: 0.8125rem;
+        padding: var(--space-xxs) var(--space-xs);
+        font-size: var(--font-size-xs);
     }
     
     input[type="text"],
@@ -682,7 +684,7 @@ body[data-theme="dark"] .prediction-text {
     }
     
     .theme-toggle {
-        padding: 6px;
+        padding: var(--space-xxs);
     }
     
     .theme-toggle-text {
