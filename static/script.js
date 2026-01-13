@@ -1,5 +1,75 @@
 // Troll-Tove Spåkone - Interactive Features
 
+// Theme Toggle Functionality
+(function() {
+    // Get stored theme or check system preference
+    function getInitialTheme() {
+        const storedTheme = localStorage.getItem('theme');
+        if (storedTheme) {
+            return storedTheme;
+        }
+        // Check system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark';
+        }
+        return 'light';
+    }
+    
+    // Apply theme to document
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+        } else {
+            document.body.removeAttribute('data-theme');
+        }
+        localStorage.setItem('theme', theme);
+        
+        // Update toggle button if it exists
+        const toggleButton = document.getElementById('themeToggle');
+        if (toggleButton) {
+            const icon = toggleButton.querySelector('.theme-toggle-icon');
+            const text = toggleButton.querySelector('.theme-toggle-text');
+            if (theme === 'dark') {
+                if (icon) icon.textContent = '☀️';
+                if (text) text.textContent = 'Lys';
+            } else {
+                if (icon) icon.textContent = '🌙';
+                if (text) text.textContent = 'Mørk';
+            }
+        }
+    }
+    
+    // Toggle between themes
+    function toggleTheme() {
+        const currentTheme = document.body.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        applyTheme(newTheme);
+    }
+    
+    // Initialize theme on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Apply initial theme
+        const initialTheme = getInitialTheme();
+        applyTheme(initialTheme);
+        
+        // Set up theme toggle button if it exists
+        const toggleButton = document.getElementById('themeToggle');
+        if (toggleButton) {
+            toggleButton.addEventListener('click', toggleTheme);
+        }
+        
+        // Listen for system theme changes
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+                // Only apply system preference if user hasn't manually set a theme
+                if (!localStorage.getItem('theme')) {
+                    applyTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+        }
+    });
+})();
+
 // Show loading animation when form is submitted
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');

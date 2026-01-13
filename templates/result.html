@@ -8,24 +8,34 @@
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body class="dark">
+<body>
+    <!-- Theme Toggle Button -->
+    <button id="themeToggle" class="theme-toggle" aria-label="Bytt fargetema">
+        <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+        <span class="theme-toggle-text">Mørk</span>
+    </button>
+
     <div class="container">
-        <img src="{{ url_for('static', filename='troill tove.jpg') }}" alt="Troll-Tove" class="troll-image">
-        <h1 class="header">🔮 Troll-Tove har spådd! 🔮</h1>
+        <header>
+            <img src="{{ url_for('static', filename='troill tove.jpg') }}" alt="Troll-Tove" class="troll-image">
+            <h1 class="header">🔮 Troll-Tove har spådd! 🔮</h1>
+        </header>
         
-        <div class="result" role="main" aria-live="polite">
-            <p><strong>Du spurte:</strong> <em>{{ sporsmal }}</em></p>
-            <p><strong>{{ intro }}</strong></p>
-            <p><strong>Svaret fra Troll-Tove:</strong></p>
-            <div class="prediction-text">
-                💀 {{ spadom }} 💀
-            </div>
-        </div>
+        <main class="result" role="main" aria-live="polite">
+            <section aria-label="Spørsmål og svar">
+                <p><strong>Du spurte:</strong> <em>{{ sporsmal }}</em></p>
+                <p><strong>{{ intro }}</strong></p>
+                <p><strong>Svaret fra Troll-Tove:</strong></p>
+                <div class="prediction-text">
+                    💀 {{ spadom }} 💀
+                </div>
+            </section>
+        </main>
         
-        <div class="action-buttons">
+        <nav class="action-buttons" aria-label="Handlinger">
             <a href="/" class="back-button" aria-label="Still et nytt spørsmål">🔮 Still et nytt spørsmål</a>
             <button id="shareButton" class="share-button" aria-label="Del spådommen">📤 Del spådommen</button>
-        </div>
+        </nav>
     </div>
     
     <script src="{{ url_for('static', filename='script.js') }}"></script>

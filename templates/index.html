@@ -9,35 +9,51 @@
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body class="light">
-    <div class="container">
-        <img src="{{ url_for('static', filename='troill tove.jpg') }}" alt="Troll-Tove" class="troll-image">
-        <h1 class="header">🔮 Troll-Tove sin Spåkrok 🔮</h1>
+<body>
+    <!-- Theme Toggle Button -->
+    <button id="themeToggle" class="theme-toggle" aria-label="Bytt fargetema">
+        <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+        <span class="theme-toggle-text">Mørk</span>
+    </button>
 
-        <form method="POST" aria-label="Spør Troll-Tove">
-            <label for="navn" class="sr-only">Ditt navn</label>
-            <input type="text" 
-                   id="navn"
-                   name="navn" 
-                   placeholder="Ka heite du, din forbanna dust?" 
-                   maxlength="100"
-                   required
-                   aria-required="true">
-            
-            <label for="sporsmal" class="sr-only">Ditt spørsmål</label>
-            <input type="text" 
-                   id="sporsmal"
-                   name="sporsmal" 
-                   placeholder="Ka vil du vite? F.eks 'Når spille Glimt?'" 
-                   maxlength="500"
-                   required
-                   aria-required="true">
-            
-            <button type="submit" aria-label="Send spørsmål til Troll-Tove">Spå mæ, Tove!</button>
-        </form>
+    <div class="container" role="main">
+        <header>
+            <img src="{{ url_for('static', filename='troill tove.jpg') }}" alt="Troll-Tove" class="troll-image">
+            <h1 class="header">🔮 Troll-Tove sin Spåkrok 🔮</h1>
+        </header>
 
-        <a href="/glimtmodus" class="mode-button glimt-button" aria-label="Gå til Glimt-modus">⚽ Glimt-modus</a>
-        <a href="/darkmodus" class="mode-button" aria-label="Gå til Dark-modus">🌒 Dark-modus</a>
+        <section aria-label="Spør Troll-Tove">
+            <form method="POST" aria-label="Spørsmålsskjema">
+                <div class="form-group">
+                    <label for="navn" class="sr-only">Ditt navn</label>
+                    <input type="text" 
+                           id="navn"
+                           name="navn" 
+                           placeholder="Ka heite du, din forbanna dust?" 
+                           maxlength="100"
+                           required
+                           aria-required="true">
+                </div>
+                
+                <div class="form-group">
+                    <label for="sporsmal" class="sr-only">Ditt spørsmål</label>
+                    <input type="text" 
+                           id="sporsmal"
+                           name="sporsmal" 
+                           placeholder="Ka vil du vite? F.eks 'Når spille Glimt?'" 
+                           maxlength="500"
+                           required
+                           aria-required="true">
+                </div>
+                
+                <button type="submit" aria-label="Send spørsmål til Troll-Tove">Spå mæ, Tove!</button>
+            </form>
+        </section>
+
+        <nav aria-label="Spesialmoduser">
+            <a href="/glimtmodus" class="mode-button glimt-button" aria-label="Gå til Glimt-modus">⚽ Glimt-modus</a>
+            <a href="/darkmodus" class="mode-button" aria-label="Gå til Dark-modus">🌒 Dark-modus</a>
+        </nav>
     </div>
     
     <script src="{{ url_for('static', filename='script.js') }}"></script>
