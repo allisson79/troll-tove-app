@@ -48,9 +48,22 @@ class OpenAIGenerator:
         """
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         self.model = model or os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-        self.max_tokens = max_tokens or int(os.getenv("OPENAI_MAX_TOKENS", "220"))
-        self.temperature = temperature or float(os.getenv("OPENAI_TEMPERATURE", "0.8"))
-        self.timeout = timeout or int(os.getenv("OPENAI_TIMEOUT", "30"))
+        
+        # Parse numeric environment variables with fallbacks
+        try:
+            self.max_tokens = max_tokens or int(os.getenv("OPENAI_MAX_TOKENS", "220"))
+        except (ValueError, TypeError):
+            self.max_tokens = 220
+            
+        try:
+            self.temperature = temperature or float(os.getenv("OPENAI_TEMPERATURE", "0.8"))
+        except (ValueError, TypeError):
+            self.temperature = 0.8
+            
+        try:
+            self.timeout = timeout or int(os.getenv("OPENAI_TIMEOUT", "30"))
+        except (ValueError, TypeError):
+            self.timeout = 30
         
         # Anti-repeat cache: stores last N answers per mode
         self.recent_answers = {
@@ -119,6 +132,11 @@ class OpenAIGenerator:
             
             prediction = response.choices[0].message.content.strip()
             
+            # Handle None or empty content
+            if not prediction:
+                logger.warning("OpenAI returned empty content, using fallback")
+                return fallback()
+            
             # Store in anti-repeat cache
             self.recent_answers[mode].append(prediction)
             
@@ -145,7 +163,10 @@ class OpenAIGenerator:
         recent = list(self.recent_answers[mode])
         anti_repeat_text = ""
         if recent:
-            anti_repeat_text = f"\n\nUnngå å gjenta disse nylige spådommene:\n" + "\n".join(f"- {ans[:100]}..." for ans in recent[-5:])
+            # Filter and format valid strings only
+            valid_recent = [str(ans)[:100] for ans in recent[-5:] if ans]
+            if valid_recent:
+                anti_repeat_text = f"\n\nUnngå å gjenta disse nylige spådommene:\n" + "\n".join(f"- {ans}..." for ans in valid_recent)
         
         if mode == "glimt":
             return (

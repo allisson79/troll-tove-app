@@ -50,6 +50,20 @@ class TestOpenAIGenerator(unittest.TestCase):
             self.assertEqual(generator.temperature, 0.5)
             self.assertEqual(generator.timeout, 60)
     
+    def test_invalid_env_var_configuration(self):
+        """Test that invalid environment variables use defaults"""
+        env_vars = {
+            "OPENAI_MAX_TOKENS": "invalid",
+            "OPENAI_TEMPERATURE": "not-a-number",
+            "OPENAI_TIMEOUT": "abc"
+        }
+        with patch.dict(os.environ, env_vars, clear=True):
+            generator = OpenAIGenerator()
+            # Should fall back to defaults
+            self.assertEqual(generator.max_tokens, 220)
+            self.assertEqual(generator.temperature, 0.8)
+            self.assertEqual(generator.timeout, 30)
+    
     def test_fallback_when_disabled(self):
         """Test that fallback is called when OpenAI is disabled"""
         generator = OpenAIGenerator()
@@ -170,6 +184,37 @@ class TestOpenAIGenerator(unittest.TestCase):
         mock_client = Mock()
         mock_openai_class.return_value = mock_client
         mock_client.chat.completions.create.side_effect = Exception("API Error")
+        
+        with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
+            generator = OpenAIGenerator()
+            
+            fallback_called = False
+            def mock_fallback():
+                nonlocal fallback_called
+                fallback_called = True
+                return "Fallback prediction"
+            
+            result = generator.generate_prediction(
+                mode="standard",
+                user_name="Test",
+                user_question="Test",
+                fallback=mock_fallback
+            )
+            
+            self.assertTrue(fallback_called)
+            self.assertEqual(result, "Fallback prediction")
+    
+    @patch('openai.OpenAI')
+    def test_fallback_on_empty_content(self, mock_openai_class):
+        """Test fallback when API returns empty content"""
+        mock_client = Mock()
+        mock_openai_class.return_value = mock_client
+        
+        # Mock response with None content
+        mock_response = Mock()
+        mock_response.choices = [Mock()]
+        mock_response.choices[0].message.content = None
+        mock_client.chat.completions.create.return_value = mock_response
         
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
             generator = OpenAIGenerator()
