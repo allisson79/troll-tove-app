@@ -6,13 +6,29 @@
     <title>404 - Ikkje funne</title>
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        // Apply theme immediately to prevent FOUC
+        (function() {
+            const theme = localStorage.getItem('theme') || 
+                (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        })();
+    </script>
 </head>
-<body class="dark">
-    <div class="container">
-        <div class="error-code">404</div>
+<body>
+    <!-- Theme Toggle Button -->
+    <button id="themeToggle" class="theme-toggle" aria-label="Bytt fargetema">
+        <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+        <span class="theme-toggle-text">Mørk</span>
+    </button>
+
+    <div class="container" role="main">
+        <div class="error-code" aria-hidden="true">404</div>
         <h1 class="message">🔮 Troll-Tove finner ikkje denne sida 🔮</h1>
         <p>Sida du leita etter eksistere ikkje... Kanskje den va bare en spådom?</p>
         <a href="/" class="back-button">Tilbake te Troll-Tove</a>
     </div>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
