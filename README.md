@@ -13,14 +13,42 @@ En norsk spåkone-app med humor, spesielt for Bodø/Glimt-fans! Troll-Tove gir s
 - **Hovedmodus**: Spør Troll-Tove om hva som helst
 - **Glimt-modus**: Få spådommer om Bodø/Glimt
 - **Dark-modus**: Dystere spådommer om framtida
+- **AI-genererte svar**: Bruk OpenAI for lengre, mer varierte spådommer (valgfritt)
 - **IP-basert caching**: Samme IP får samme spådom i en time
 - **Health check endpoint**: Overvåk appens helse
+
+## ✨ AI-Genererte Spådommer (Nytt!)
+
+Troll-Tove kan nå bruke OpenAI (ChatGPT) for å generere dynamiske spådommer på nordnorsk!
+
+**Fordeler med AI-modus:**
+- Lengre, mer detaljerte svar (2-4 setninger)
+- Mindre repetisjon (smart anti-repeat system)
+- Bevarer Nordnorsk "spåkone" tone
+- Automatisk fallback til fil-baserte spådommer hvis API feiler
+
+**Slik aktiverer du AI-modus:**
+
+1. Få en OpenAI API-nøkkel: https://platform.openai.com/api-keys
+2. Legg til i `.env` filen:
+   ```bash
+   OPENAI_API_KEY=your-api-key-here
+   ```
+3. Start appen - den bruker nå AI for spådommer!
+
+**Kostnadskontroll:**
+- Bruker `gpt-4o-mini` som standard (kostnadseffektivt)
+- Maksimum 220 tokens per svar
+- Konfigurerbar temperatur (0.8 standard)
+
+**Valgfritt - appen fungerer helt fint uten API-nøkkel!** Den bruker da de forhåndsskrevne spådommene fra tekstfilene.
 
 ## Teknologi
 
 - Python 3.9+
 - Flask 2.3.2
 - Gunicorn for produksjon
+- OpenAI API (valgfritt, for AI-genererte svar)
 
 ## Installasjon
 
@@ -87,8 +115,18 @@ gunicorn -w 4 -b 0.0.0.0:8000 app:app
 
 ## Miljøvariabler
 
+### Påkrevd:
 - `SECRET_KEY`: Flask secret key (viktig i produksjon!)
 - `FLASK_DEBUG`: Sett til `true` kun i utvikling
+
+### Valgfritt (OpenAI-integrasjon):
+- `OPENAI_API_KEY`: OpenAI API-nøkkel for AI-genererte spådommer
+- `OPENAI_MODEL`: Modell å bruke (standard: `gpt-4o-mini`)
+- `OPENAI_MAX_TOKENS`: Maks tokens per svar (standard: 220)
+- `OPENAI_TEMPERATURE`: Tilfeldighet 0-2 (standard: 0.8)
+- `OPENAI_TIMEOUT`: API timeout i sekunder (standard: 30)
+
+### Annet:
 - `API_FOOTBALL_KEY`: API-nøkkel (for fremtidig bruk)
 
 ## Endpoints
@@ -112,8 +150,20 @@ gunicorn -w 4 -b 0.0.0.0:8000 app:app
 
 ## Testing
 
-Kjør GitHub Actions workflow eller test lokalt:
+Kjør tester med pytest:
 
+```bash
+# Installer pytest hvis nødvendig
+pip install -r requirements.txt
+
+# Kjør alle tester
+pytest tests/
+
+# Kjør med verbose output
+pytest tests/ -v
+```
+
+Test at appen starter:
 ```bash
 python -c "import app; print('App imports successfully')"
 ```
@@ -160,6 +210,9 @@ Se [DEPLOYMENT.md](DEPLOYMENT.md) for:
 For produksjon, sett disse:
 - `SECRET_KEY` - Generer med: `python -c "import secrets; print(secrets.token_hex(32))"`
 - `FLASK_DEBUG` - Sett til `false`
+
+For AI-genererte spådommer (valgfritt):
+- `OPENAI_API_KEY` - Få fra https://platform.openai.com/api-keys
 
 ## Lisens
 

@@ -11,4 +11,6 @@ services:
         value: false
       - key: PYTHON_VERSION
         value: 3.12.3
+      - key: OPENAI_API_KEY
+        sync: false  # Must be set manually in Render dashboard
     healthCheckPath: /health
