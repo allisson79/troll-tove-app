@@ -21,6 +21,7 @@ Design Principles:
 from .predictions import load_predictions_from_file, PredictionSelector
 from .tone import ToneFormatter
 from .anti_repeat import PredictionCache, IPValidator
+from .openai_client import OpenAIGenerator
 
 __version__ = "1.0.0"
 
@@ -30,4 +31,5 @@ __all__ = [
     "ToneFormatter",
     "PredictionCache",
     "IPValidator",
+    "OpenAIGenerator",
 ]

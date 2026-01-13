@@ -46,6 +46,7 @@ Before deploying, make sure you have:
    - Add the following:
      - `SECRET_KEY`: Click "Generate" or use: `python -c "import secrets; print(secrets.token_hex(32))"`
      - `FLASK_DEBUG`: `false`
+     - `OPENAI_API_KEY` (optional, for AI-powered predictions): Your OpenAI API key from https://platform.openai.com/api-keys
 
 5. **Deploy**:
    - Click "Create Web Service"
@@ -99,6 +100,9 @@ The repository includes a `render.yaml` file. You can also:
    # Generate a secret key
    heroku config:set SECRET_KEY=$(python -c "import secrets; print(secrets.token_hex(32))")
    heroku config:set FLASK_DEBUG=false
+   
+   # Optional: Add OpenAI API key for AI-powered predictions
+   # heroku config:set OPENAI_API_KEY=your-openai-api-key-here
    ```
 
 6. **Deploy**:
@@ -290,12 +294,22 @@ All platforms require these environment variables:
 | `SECRET_KEY` | Flask secret key for sessions | Generate: `python -c "import secrets; print(secrets.token_hex(32))"` |
 | `FLASK_DEBUG` | Debug mode (should be false in production) | `false` |
 
-### Optional:
+### Optional (but recommended for AI-powered predictions):
 
 | Variable | Description | Example |
 |----------|-------------|---------|
+| `OPENAI_API_KEY` | OpenAI API key for AI-generated predictions | Get from https://platform.openai.com/api-keys |
+| `OPENAI_MODEL` | OpenAI model to use (default: gpt-4o-mini) | `gpt-4o-mini` |
+| `OPENAI_MAX_TOKENS` | Max tokens for response (default: 220) | `220` |
+| `OPENAI_TEMPERATURE` | Randomness level 0-2 (default: 0.8) | `0.8` |
+| `OPENAI_TIMEOUT` | API timeout in seconds (default: 30) | `30` |
 | `API_FOOTBALL_KEY` | For future football API integration | Your API key |
 | `PORT` | Port number (usually set by platform) | `8000` |
+
+**Note on OpenAI Integration:**
+- If `OPENAI_API_KEY` is not set, the app will work normally using pre-written predictions from text files.
+- With `OPENAI_API_KEY` set, predictions are generated dynamically using AI, providing longer, more varied, and less repetitive answers.
+- The default model `gpt-4o-mini` is cost-effective while maintaining good quality.
 
 ---
 

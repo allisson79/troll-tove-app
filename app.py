@@ -10,7 +10,8 @@ from troll_tove import (
     PredictionSelector,
     ToneFormatter,
     PredictionCache,
-    IPValidator
+    IPValidator,
+    OpenAIGenerator
 )
 
 load_dotenv()
@@ -47,6 +48,9 @@ prediction_selector = PredictionSelector(fotball_spaadommer, random_spaadommer)
 # Initialize tone formatter
 tone_formatter = ToneFormatter()
 
+# Initialize OpenAI generator
+openai_generator = OpenAIGenerator()
+
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -63,7 +67,16 @@ def index():
         # Check cache or generate new prediction
         prediction = ip_cache.get(ip_key)
         if not prediction:
-            prediction = random.choice(prediction_selector.get_all_predictions())
+            # Try OpenAI first, fallback to file-based
+            def fallback_prediction():
+                return random.choice(prediction_selector.get_all_predictions())
+            
+            prediction = openai_generator.generate_prediction(
+                mode="standard",
+                user_name=user_name,
+                user_question=user_question,
+                fallback=fallback_prediction
+            )
             ip_cache.set(ip_key, prediction)
 
         intro_message = tone_formatter.format_standard_intro(user_name)
@@ -76,7 +89,18 @@ def index():
 def glimtmodus():
     user_name = "du jævel"
     user_question = "Hvordan går det med Glimt?"
-    prediction = random.choice(prediction_selector.get_fotball_prediction())
+    
+    # Try OpenAI first, fallback to file-based
+    def fallback_prediction():
+        return random.choice(prediction_selector.get_fotball_prediction())
+    
+    prediction = openai_generator.generate_prediction(
+        mode="glimt",
+        user_name=user_name,
+        user_question=user_question,
+        fallback=fallback_prediction
+    )
+    
     intro_message = tone_formatter.format_glimt_intro(user_name)
     return render_template("result.html", sporsmal=user_question, spadom=prediction, intro=intro_message)
 
@@ -85,7 +109,18 @@ def glimtmodus():
 def darkmodus():
     user_name = "kompis"
     user_question = "Hva bringer mørket?"
-    prediction = random.choice(prediction_selector.get_random_prediction())
+    
+    # Try OpenAI first, fallback to file-based
+    def fallback_prediction():
+        return random.choice(prediction_selector.get_random_prediction())
+    
+    prediction = openai_generator.generate_prediction(
+        mode="dark",
+        user_name=user_name,
+        user_question=user_question,
+        fallback=fallback_prediction
+    )
+    
     intro_message = tone_formatter.format_dark_intro(user_name)
     return render_template("result.html", sporsmal=user_question, spadom=prediction, intro=intro_message)
 
