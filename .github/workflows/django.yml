@@ -38,4 +38,4 @@ jobs:
         python -c "import app; print('App imports successfully')"
     - name: Run Unit Tests
       run: |
-        python -m unittest test_app.py -v
+        python -m pytest tests/ -v
