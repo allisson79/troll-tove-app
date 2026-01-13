@@ -40,6 +40,7 @@
     --color-dark-success: #86efac;
     
     /* Spacing Scale */
+    --space-xxs: 6px;
     --space-xs: 8px;
     --space-sm: 12px;
     --space-md: 16px;
@@ -49,6 +50,7 @@
     
     /* Typography Scale */
     --font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Avenir Next', 'Avenir', sans-serif;
+    --font-size-xs: 0.8125rem;
     --font-size-sm: 0.875rem;
     --font-size-base: 1rem;
     --font-size-lg: 1.125rem;
@@ -140,20 +142,20 @@ body[data-theme="dark"]::before {
 /* Theme Toggle Button */
 .theme-toggle {
     position: fixed;
-    top: var(--space-lg);
-    right: var(--space-lg);
+    top: var(--space-md);
+    right: var(--space-md);
     background: var(--color-surface);
     border: 2px solid var(--color-border);
     border-radius: var(--radius-full);
-    padding: var(--space-sm) var(--space-md);
+    padding: var(--space-xs) var(--space-sm);
     cursor: pointer;
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-sm);
     box-shadow: var(--shadow-md);
     transition: all var(--transition-base);
     z-index: 1000;
     display: flex;
     align-items: center;
-    gap: var(--space-xs);
+    gap: var(--space-xxs);
     font-weight: var(--font-weight-medium);
     color: var(--color-text);
 }
@@ -175,7 +177,7 @@ body[data-theme="dark"] .theme-toggle {
 }
 
 .theme-toggle-icon {
-    font-size: 1.25rem;
+    font-size: var(--font-size-base);
     line-height: 1;
 }
 
@@ -630,10 +632,10 @@ body[data-theme="dark"] .prediction-text {
     }
     
     .theme-toggle {
-        top: var(--space-md);
-        right: var(--space-md);
-        padding: var(--space-xs) var(--space-sm);
-        font-size: var(--font-size-base);
+        top: var(--space-sm);
+        right: var(--space-sm);
+        padding: var(--space-xxs) var(--space-xs);
+        font-size: var(--font-size-xs);
     }
     
     input[type="text"],
@@ -682,7 +684,7 @@ body[data-theme="dark"] .prediction-text {
     }
     
     .theme-toggle {
-        padding: var(--space-xs);
+        padding: var(--space-xxs);
     }
     
     .theme-toggle-text {
